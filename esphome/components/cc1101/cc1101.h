@@ -42,5 +42,13 @@ class CC1101Component : public Component,
   void reset_(bool power_on_reset = false);
 };
 
+class CC1101Device {
+ public:
+  void set_cc1101_parent(CC1101Component *cc1101) { this->cc1101_ = cc1101; }
+
+ protected:
+  CC1101Component *cc1101_{nullptr};
+};
+
 }  // namespace cc1101
 }  // namespace esphome
