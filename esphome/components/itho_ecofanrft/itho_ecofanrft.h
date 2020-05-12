@@ -19,7 +19,7 @@ struct IthoEcoFanRftComponentStore {
   static void gpio_intr(IthoEcoFanRftComponentStore *arg);
 };
 
-class IthoEcoFanRftComponent : public fan::FanState {
+class IthoEcoFanRftComponent : public fan::FanState, public cc1101::CC1101Device {
  public:
   void setup() override;
   void loop() override;
@@ -50,7 +50,6 @@ class IthoEcoFanRftComponent : public fan::FanState {
   std::vector<uint8_t> rf_address_;
   std::vector<uint8_t> peer_rf_address_;
   IthoEcoFanRftComponentStore store_;
-  cc1101::CC1101Component *cc1101_{nullptr};
   bool next_update_{true};
   std::vector<uint8_t> packet_;
   std::uint8_t counter_ = 0;
