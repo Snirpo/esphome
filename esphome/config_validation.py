@@ -566,6 +566,24 @@ def mac_address(value):
     return core.MACAddress(*parts_int)
 
 
+def rf_address(value):
+    value = string_strict(value)
+    parts = value.split(':')
+    if len(parts) != 3:
+        raise Invalid("RF Address must consist of 3 : (colon) separated parts")
+    parts_int = []
+
+    if any(len(part) != 2 for part in parts):
+        raise Invalid("RF Address must be format XX:XX:XX")
+    for part in parts:
+        try:
+            parts_int.append(int(part, 16))
+        except ValueError:
+            raise Invalid("RF Address parts must be hexadecimal values from 00 to FF")
+
+    return core.RFAddress(*parts_int)
+
+
 def bind_key(value):
     value = string_strict(value)
     parts = [value[i:i+2] for i in range(0, len(value), 2)]

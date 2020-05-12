@@ -56,6 +56,23 @@ class MACAddress:
         return RawExpression(f'0x{num}ULL')
 
 
+class RFAddress(object):
+    def __init__(self, *parts):
+        if len(parts) != 3:
+            raise ValueError(u"RF Address must consist of 3 items")
+        self.parts = parts
+
+    def __str__(self):
+        return ':'.join('{:02X}'.format(part) for part in self.parts)
+
+    @property
+    def as_hex(self):
+        from esphome.cpp_generator import RawExpression
+
+        num = ''.join('{:02X}'.format(part) for part in self.parts)
+        return RawExpression('0x{}ULL'.format(num))
+
+
 def is_approximately_integer(value):
     if isinstance(value, int):
         return True
@@ -237,6 +254,7 @@ class Lambda:
             if s.startswith('/'):
                 return " "  # note: a space and not an empty string
             return s
+
         pattern = re.compile(
             r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
             re.DOTALL | re.MULTILINE
@@ -444,7 +462,7 @@ def coroutine_with_priority(priority):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             import random
-            instance_id = random.randint(0, 2**32)
+            instance_id = random.randint(0, 2 ** 32)
             kwargs['__esphome_coroutine_instance__'] = instance_id
             gen = _wrapper_generator(*args, **kwargs)
             # pylint: disable=protected-access
@@ -455,6 +473,7 @@ def coroutine_with_priority(priority):
         wrapper._esphome_coroutine = True
         wrapper.priority = priority
         return wrapper
+
     return decorator
 
 
@@ -784,6 +803,7 @@ class AutoLoad(OrderedDict):
 
 class EnumValue:
     """Special type used by ESPHome to mark enum values for cv.enum."""
+
     @property
     def enum_value(self):
         return getattr(self, '_enum_value', None)
