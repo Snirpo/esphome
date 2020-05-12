@@ -29,7 +29,7 @@ def validate(config):
     return config
 
 
-CONFIG_SCHEMA = cv.All(cv.Schema({
+CONFIG_SCHEMA = cv.All(fan.FAN_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(IthoEcoFanRftComponent),
     cv.Required(CONF_ITHO_IRQ_PIN): pins.gpio_input_pin_schema,
     cv.Required(CONF_RF_ADDRESS): cv.rf_address,
