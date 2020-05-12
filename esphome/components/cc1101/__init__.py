@@ -15,7 +15,7 @@ CONFIG_SCHEMA = cv.All(cv.Schema({
 }).extend(cv.COMPONENT_SCHEMA).extend(spi.SPI_DEVICE_SCHEMA))
 
 C1101_DEVICE_SCHEMA = cv.Schema({
-    cv.GenerateID(CONF_CC1101_ID): cv.use_id(CC1101Component),
+    cv.GenerateID(CONF_CC1101_ID): cv.use_id(CC1101Component)
 })
 
 

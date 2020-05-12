@@ -12,6 +12,7 @@ class CC1101Component : public Component,
  public:
   void setup() override;
   float get_setup_priority() const override;
+  void dump_config() override;
 
   void send_data(const std::vector<uint8_t> &data);
   std::vector<uint8_t> receive_data(uint8_t max_length);

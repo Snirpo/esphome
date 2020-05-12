@@ -30,6 +30,8 @@ void CC1101Component::setup() {
   ESP_LOGCONFIG(TAG, "Found CC1101: partnum (%x), version (%x)", partnum, version);
 }
 
+void CC1101Component::dump_config() { LOG_PIN("  CS Pin: ", this->cs_) }
+
 float CC1101Component::get_setup_priority() const { return setup_priority::DATA; }
 
 void CC1101Component::send_data(const std::vector<uint8_t> &data) {
