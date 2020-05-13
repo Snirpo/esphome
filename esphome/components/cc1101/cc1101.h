@@ -6,11 +6,21 @@
 namespace esphome {
 namespace cc1101 {
 
+struct InterruptData {
+  volatile bool data_available;
+  volatile uint8_t count;
+  ISRInternalGPIOPin *pin;
+
+  void reset();
+  static void gpio_intr(InterruptData *arg);
+};
+
 class CC1101Component : public Component,
                         public spi::SPIDevice<spi::BIT_ORDER_MSB_FIRST, spi::CLOCK_POLARITY_LOW,
                                               spi::CLOCK_PHASE_LEADING, spi::DATA_RATE_1MHZ> {
  public:
   void setup() override;
+  void loop() override;
   float get_setup_priority() const override;
   void dump_config() override;
 
@@ -32,6 +42,10 @@ class CC1101Component : public Component,
 
   int16_t read_rssi();
 
+  void set_irq_pin(GPIOPin *irq) { irq_ = irq; }
+
+  bool data_available();
+
  protected:
   void select_() { enable(); }
   void deselect_() { disable(); };
@@ -40,6 +54,9 @@ class CC1101Component : public Component,
   uint8_t read_register_with_sync_problem_(uint8_t address);
 
   void reset_(bool power_on_reset = false);
+
+  GPIOPin *irq_;
+  InterruptData interruptData_;
 };
 
 class CC1101Device {

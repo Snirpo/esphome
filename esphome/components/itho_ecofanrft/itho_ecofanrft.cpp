@@ -7,12 +7,6 @@ namespace itho_ecofanrft {
 
 static const char *TAG = "itho_ecofanrft";
 
-void ICACHE_RAM_ATTR IthoEcoFanRftComponentStore::gpio_intr(IthoEcoFanRftComponentStore *arg) {
-  arg->data_available = true;
-  arg->count = (arg->count + 1) % 0xFF;
-}
-void ICACHE_RAM_ATTR IthoEcoFanRftComponentStore::reset() { data_available = false; }
-
 std::string IthoEcoFanRftComponent::format_addr_(std::vector<uint8_t> addr) {
   std::string s;
   char buf[20];
@@ -32,7 +26,6 @@ void itho_ecofanrft::IthoEcoFanRftComponent::dump_config() {
   if (this->peer_rf_address_.size() > 0) {
     ESP_LOGCONFIG(TAG, "  RF Peer Address: '%s'", this->format_addr_(this->peer_rf_address_).c_str());
   }
-  LOG_PIN("  IRQ Pin: ", this->irq_);
 
 #ifdef ESPHOME_LOG_HAS_VERY_VERBOSE
   std::vector<uint8_t> config = this->cc1101_->read_burst_register(0x00, 47);
@@ -50,12 +43,6 @@ void IthoEcoFanRftComponent::setup() {
   // Setup module for Itho protocol
   this->init_itho();
 
-  // Enable interrupt on packet in RX FIFO
-  this->store_.data_available = false;
-  this->store_.count = 0;
-  this->store_.pin = this->irq_->to_isr();
-  this->irq_->attach_interrupt(IthoEcoFanRftComponentStore::gpio_intr, &this->store_, RISING);
-
   auto traits = fan::FanTraits(false, true);  // No oscillating, just speed
   this->set_traits(traits);
   this->add_on_state_callback([this]() { this->next_update_ = true; });
@@ -64,13 +51,7 @@ void IthoEcoFanRftComponent::setup() {
   this->enable_receive_mode();
 }
 void IthoEcoFanRftComponent::loop() {
-  if (this->store_.data_available) {
-    this->store_.reset();
-
-    int16_t rssi = this->cc1101_->read_rssi();
-
-    ESP_LOGD(TAG, "Data available in RX FIFO! (%02x) (%4d dBm)", this->store_.count, rssi);
-
+  if (this->cc1101_->data_available()) {
     {
       uint8_t speed;
       if (this->get_fan_speed(this->peer_rf_address_, &speed)) {

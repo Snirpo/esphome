@@ -16,7 +16,6 @@ JoinAction = itho_ecofanrft_ns.class_('JoinAction', automation.Action)
 
 AUTOLOAD = ['fan']
 
-CONF_ITHO_IRQ_PIN = 'irq_pin'
 CONF_RF_ADDRESS = 'rf_address'
 CONF_PEER_RF_ADDRESS = 'peer_rf_address'
 
@@ -31,7 +30,6 @@ def validate(config):
 
 CONFIG_SCHEMA = cv.All(fan.FAN_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(IthoEcoFanRftComponent),
-    cv.Required(CONF_ITHO_IRQ_PIN): pins.gpio_input_pin_schema,
     cv.Required(CONF_RF_ADDRESS): cv.rf_address,
     cv.Optional(CONF_PEER_RF_ADDRESS): cv.rf_address,
 }).extend(cc1101.C1101_DEVICE_SCHEMA).extend(cv.COMPONENT_SCHEMA), validate)
@@ -49,9 +47,6 @@ def fan_join_to_code(config, action_id, template_arg, args):
 
 def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-
-    irq = yield cg.gpio_pin_expression(config[CONF_ITHO_IRQ_PIN])
-    cg.add(var.set_irq_pin(irq))
 
     cg.add(var.set_rf_address(config[CONF_RF_ADDRESS].as_hex))
     if CONF_PEER_RF_ADDRESS in config:

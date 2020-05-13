@@ -8,25 +8,12 @@
 namespace esphome {
 namespace itho_ecofanrft {
 
-class IthoEcoFanRftComponent;
-
-struct IthoEcoFanRftComponentStore {
-  volatile bool data_available;
-  volatile uint8_t count;
-  ISRInternalGPIOPin *pin;
-
-  void reset();
-  static void gpio_intr(IthoEcoFanRftComponentStore *arg);
-};
-
 class IthoEcoFanRftComponent : public fan::FanState, public cc1101::CC1101Device {
  public:
   void setup() override;
   void loop() override;
   void dump_config() override;
   float get_setup_priority() const override;
-
-  void set_irq_pin(GPIOPin *irq) { irq_ = irq; }
 
   void set_rf_address(uint64_t address) {
     this->rf_address_.resize(3, 0);
@@ -46,10 +33,8 @@ class IthoEcoFanRftComponent : public fan::FanState, public cc1101::CC1101Device
   void send_command(std::string command);
 
  private:
-  GPIOPin *irq_;
   std::vector<uint8_t> rf_address_;
   std::vector<uint8_t> peer_rf_address_;
-  IthoEcoFanRftComponentStore store_;
   bool next_update_{true};
   std::vector<uint8_t> packet_;
   std::uint8_t counter_ = 0;

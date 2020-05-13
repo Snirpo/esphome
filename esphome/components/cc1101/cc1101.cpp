@@ -5,6 +5,12 @@
 namespace esphome {
 namespace cc1101 {
 
+void ICACHE_RAM_ATTR InterruptData::gpio_intr(InterruptData *arg) {
+  arg->data_available = true;
+  arg->count = (arg->count + 1) % 0xFF;
+}
+void ICACHE_RAM_ATTR InterruptData::reset() { data_available = false; }
+
 static const char *TAG = "cc1101";
 
 void CC1101Component::setup() {
@@ -27,10 +33,28 @@ void CC1101Component::setup() {
   this->write_command_strobe(CC1101_SFTX);
   delayMicroseconds(100);
 
+  if (this->irq_) {
+    // Enable interrupt on packet in RX FIFO
+    this->interruptData_.data_available = false;
+    this->interruptData_.count = 0;
+    this->interruptData_.pin = this->irq_->to_isr();
+    this->irq_->attach_interrupt(InterruptData::gpio_intr, &this->interruptData_, RISING);
+  }
+
   ESP_LOGCONFIG(TAG, "Found CC1101: partnum (%x), version (%x)", partnum, version);
 }
 
-void CC1101Component::dump_config() { LOG_PIN("  CS Pin: ", this->cs_) }
+void CC1101Component::loop() {
+  if (this->interruptData_.data_available) {
+    int16_t rssi = this->read_rssi();
+    ESP_LOGD(TAG, "Data available in RX FIFO! (%02x) (%4d dBm)", this->interruptData_.count, rssi);
+  }
+}
+
+void CC1101Component::dump_config() {
+  LOG_PIN("  CS Pin: ", this->cs_);
+  LOG_PIN("  IRQ Pin: ", this->irq_);
+}
 
 float CC1101Component::get_setup_priority() const { return setup_priority::DATA; }
 
@@ -294,6 +318,12 @@ int16_t CC1101Component::read_rssi() {
     rssi = (raw_rssi) / 2 - 74;
   }
   return rssi;
+}
+
+bool CC1101Component::data_available() {
+  bool b = interruptData_.data_available;
+  interruptData_.reset();
+  return b;
 }
 
 }  // namespace cc1101
