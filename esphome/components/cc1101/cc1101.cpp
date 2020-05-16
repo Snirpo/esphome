@@ -9,11 +9,13 @@ void ICACHE_RAM_ATTR InterruptData::gpio_intr(InterruptData *arg) {
   arg->data_available = true;
   arg->count = (arg->count + 1) % 0xFF;
 }
-void ICACHE_RAM_ATTR InterruptData::reset() { data_available = false; }
+void InterruptData::reset() { data_available = false; }
 
 static const char *TAG = "cc1101";
 
 void CC1101Component::setup() {
+  ESP_LOGD(TAG, "Setup CC1101");
+
   spi_setup();
 
   uint8_t partnum, version;
@@ -34,6 +36,7 @@ void CC1101Component::setup() {
   delayMicroseconds(100);
 
   if (this->irq_) {
+    ESP_LOGD(TAG, "Enabling interrupt");
     // Enable interrupt on packet in RX FIFO
     this->interruptData_.data_available = false;
     this->interruptData_.count = 0;

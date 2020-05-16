@@ -3,6 +3,11 @@
 namespace esphome {
 namespace cc1101 {
 
+struct register_setting {
+  uint8_t address;
+  uint8_t data;
+};
+
 /* Type of transfers */
 static const uint8_t CC1101_WRITE_SINGLE = 0x00;
 static const uint8_t CC1101_WRITE_BURST = 0x40;

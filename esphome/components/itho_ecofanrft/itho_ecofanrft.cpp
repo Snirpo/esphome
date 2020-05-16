@@ -35,10 +35,10 @@ void itho_ecofanrft::IthoEcoFanRftComponent::dump_config() {
 #endif
 }
 void IthoEcoFanRftComponent::setup() {
-  if (!this->cc1101_->is_failed()) {
-    this->mark_failed();
-    return;
-  }
+//  if (!this->cc1101_->is_failed()) {
+//    this->mark_failed();
+//    return;
+//  }
 
   // Setup module for Itho protocol
   this->init_itho();
@@ -138,6 +138,7 @@ void IthoEcoFanRftComponent::schedule_send_packet_() {
 }
 
 void IthoEcoFanRftComponent::init_itho() {
+  ESP_LOGVV(TAG, "Init itho");
   for (register_setting r : ITHO_CC1101_CONFIG) {
     this->cc1101_->write_register(r.address, r.data);
   }

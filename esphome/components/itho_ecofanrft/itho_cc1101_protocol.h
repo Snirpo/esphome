@@ -24,11 +24,6 @@ using namespace cc1101;
 
 static const uint8_t MAX_PACKET_LEN = 0x3C;  // 60 bytes max in the air. Less than max RX fifo size.
 
-using register_setting = struct {
-  uint8_t address;
-  uint8_t data;
-};
-
 /**
  * Configuration reverse engineered from remote print.
  *

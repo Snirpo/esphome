@@ -47,7 +47,10 @@ class CC1101Component : public Component,
   bool data_available();
 
  protected:
-  void select_() { enable(); }
+  void select_() {
+    enable();
+    waitForMiso();
+  }
   void deselect_() { disable(); };
 
   uint8_t read_register_(uint8_t address);

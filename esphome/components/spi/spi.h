@@ -142,6 +142,11 @@ class SPIComponent : public Component {
     this->active_cs_->digital_write(false);
   }
 
+  void waitForMiso() {
+    while (miso_->digital_read())
+      ;
+  }
+
   void disable();
 
   float get_setup_priority() const override;
@@ -179,6 +184,8 @@ class SPIDevice {
   }
 
   void enable() { this->parent_->template enable<BIT_ORDER, CLOCK_POLARITY, CLOCK_PHASE, DATA_RATE>(this->cs_); }
+
+  void waitForMiso() { this->parent_->waitForMiso(); };
 
   void disable() { this->parent_->disable(); }
 
