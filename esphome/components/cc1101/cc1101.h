@@ -42,9 +42,11 @@ class CC1101Component : public Component,
 
   int16_t read_rssi();
 
-  void set_irq_pin(GPIOPin *irq) { irq_ = irq; }
+  void set_irq_pin(GPIOPin *pin) { irq_pin_ = pin; }
 
   bool data_available();
+
+  void set_serial_mode(bool serial);
 
  protected:
   void select_() {
@@ -58,7 +60,8 @@ class CC1101Component : public Component,
 
   void reset_(bool power_on_reset = false);
 
-  GPIOPin *irq_;
+  bool serial = false;
+  GPIOPin *irq_pin_;
   InterruptData interruptData_;
 };
 

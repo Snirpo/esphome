@@ -35,13 +35,21 @@ void CC1101Component::setup() {
   this->write_command_strobe(CC1101_SFTX);
   delayMicroseconds(100);
 
-  if (this->irq_) {
+  if (serial) {
+    for (register_setting r : SERIAL_CONFIG) {
+      this->write_register(r.address, r.data);
+    }
+    this->write_burst_register(CC1101_PATABLE, SERIAL_PATABLE);
+
+    this->write_command_strobe(CC1101_SCAL);
+    delay(1);
+  } else if (this->irq_pin_) {
     ESP_LOGD(TAG, "Enabling interrupt");
     // Enable interrupt on packet in RX FIFO
     this->interruptData_.data_available = false;
     this->interruptData_.count = 0;
-    this->interruptData_.pin = this->irq_->to_isr();
-    this->irq_->attach_interrupt(InterruptData::gpio_intr, &this->interruptData_, RISING);
+    this->interruptData_.pin = this->irq_pin_->to_isr();
+    this->irq_pin_->attach_interrupt(InterruptData::gpio_intr, &this->interruptData_, RISING);
   }
 
   ESP_LOGCONFIG(TAG, "Found CC1101: partnum (%x), version (%x)", partnum, version);
@@ -56,7 +64,8 @@ void CC1101Component::loop() {
 
 void CC1101Component::dump_config() {
   LOG_PIN("  CS Pin: ", this->cs_);
-  LOG_PIN("  IRQ Pin: ", this->irq_);
+  ESP_LOGCONFIG(TAG, "  Serial mode: %d", this->serial);
+  LOG_PIN("  IRQ Pin: ", this->irq_pin_);
 }
 
 float CC1101Component::get_setup_priority() const { return setup_priority::DATA; }
@@ -328,6 +337,8 @@ bool CC1101Component::data_available() {
   interruptData_.reset();
   return b;
 }
+
+void CC1101Component::set_serial_mode(bool s) { serial = s; }
 
 }  // namespace cc1101
 }  // namespace esphome
