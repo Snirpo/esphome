@@ -155,7 +155,7 @@ static const std::vector<register_setting> SERIAL_CONFIG{
     {CC1101_PKTCTRL0, 0x32}, {CC1101_MDMCFG3, 0x93},  {CC1101_MDMCFG4, 0x07},  {CC1101_MDMCFG2, 0x30},
     {CC1101_FREND0, 0x11}};
 
-static const std::vector<uint8_t> SERIAL_PATABLE = {0x00, 0x03, 0x0F, 0x27, 0x50, 0xC8, 0xC3, 0xC5};
+static const std::vector<uint8_t> SERIAL_PATABLE = {0x00, 0x1D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 };  // namespace cc1101
 }  // namespace esphome
