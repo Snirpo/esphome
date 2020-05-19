@@ -25,6 +25,8 @@ void CC1101Component::setup() {
   partnum = read_register_(CC1101_PARTNUM);
   version = read_register_(CC1101_VERSION);
 
+  ESP_LOGCONFIG(TAG, "Found CC1101: partnum (%x), version (%x)", partnum, version);
+
   if (version == 0x00 || version == 0xFF) {
     ESP_LOGE(TAG, "No CC1101 found");
     return;
@@ -43,16 +45,18 @@ void CC1101Component::setup() {
 
     this->write_command_strobe(CC1101_SCAL);
     delay(1);
+
+    // Default in receive mode
+    receive();
   } else if (this->irq_pin_) {
     ESP_LOGD(TAG, "Enabling interrupt");
+    this->irq_pin_->setup();
     // Enable interrupt on packet in RX FIFO
     this->interruptData_.data_available = false;
     this->interruptData_.count = 0;
     this->interruptData_.pin = this->irq_pin_->to_isr();
     this->irq_pin_->attach_interrupt(InterruptData::gpio_intr, &this->interruptData_, RISING);
   }
-
-  ESP_LOGCONFIG(TAG, "Found CC1101: partnum (%x), version (%x)", partnum, version);
 }
 
 void CC1101Component::loop() {
