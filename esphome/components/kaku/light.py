@@ -1,20 +1,19 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import remote_base, light
-from esphome.const import CONF_ID
-
-DEPENDENCIES = ['cc1101']
+from esphome.const import CONF_ID, CONF_OUTPUT_ID
+from esphome.components.remote_base import CONF_RECEIVER_ID, RemoteReceiverBase
 
 kaku_ns = cg.esphome_ns.namespace('kaku')
-KakuComponent = kaku_ns.class_('KakuComponent', cg.Component)
+KakuComponent = kaku_ns.class_('KakuComponent', light.LightOutput, remote_base.RemoteReceiverListener, cg.Component)
 
-AUTOLOAD = ['light']
+DEPENDENCIES = ['remote_receiver']
 
-CONF_RF_ADDRESS = 'rf_address'
+#AUTOLOAD = ['light']
 
-CONFIG_SCHEMA = cv.Schema({
-    cv.GenerateID(): cv.declare_id(KakuComponent),
-
+CONFIG_SCHEMA = light.BRIGHTNESS_ONLY_LIGHT_SCHEMA.extend({
+    cv.GenerateID(CONF_OUTPUT_ID): cv.declare_id(KakuComponent),
+    cv.GenerateID(CONF_RECEIVER_ID): cv.use_id(RemoteReceiverBase)
 }).extend(cv.COMPONENT_SCHEMA)
 
 
