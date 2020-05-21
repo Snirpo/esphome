@@ -20,23 +20,27 @@ light::LightTraits KakuComponent::get_traits() {
 void KakuComponent::write_state(light::LightState *state) {}
 
 bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
-  ESP_LOGD(TAG, "Parsing message");
-
   data.reset();
 
   // sync
   if (!expect_sync(data))
     return false;
 
+  ESP_LOGVV(TAG, "Sync found");
+
   // address
   uint32_t address = 0;
   if (!set_bits(data, address, 26))
     return false;
 
+  ESP_LOGVV(TAG, "Address: %d", address);
+
   // group bit
   uint8_t group = 0;
   if (!set_bits(data, group))
     return false;
+
+  ESP_LOGVV(TAG, "Group: %d", group);
 
   bool dim = false;
   bool on = true;
@@ -46,9 +50,19 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
     return false;
   }
 
+#ifdef ESPHOME_LOG_HAS_VERY_VERBOSE
+  if (dim) {
+    ESP_LOGVV(TAG, "Dim");
+  } else {
+    ESP_LOGVV(TAG, "On/off/dim: %s", dim ? "dim" : (on ? "on" : "off"));
+  }
+#endif
+
   uint8_t unit = 0;
   if (!set_bits(data, unit, 4))
     return false;
+
+  ESP_LOGVV(TAG, "Unit: %d", unit);
 
   uint8_t dim_val = 0;
   if (dim) {
@@ -56,16 +70,7 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
       return false;
   }
 
-#ifdef ESPHOME_LOG_HAS_VERY_VERBOSE
-  ESP_LOGVV(TAG, "Address: %d", address);
-  ESP_LOGVV(TAG, "Group: %d", group);
-  ESP_LOGVV(TAG, "Unit: %d", unit);
-  if (dim) {
-    ESP_LOGVV(TAG, "Dim: %d", dim_val);
-  } else {
-    ESP_LOGVV(TAG, "On/off: %s", on ? "on" : "off");
-  }
-#endif
+  ESP_LOGVV(TAG, "Dim: %d", dim_val);
 
   return true;
 }
@@ -80,6 +85,7 @@ template<class T> bool KakuComponent::set_bits(remote_base::RemoteReceiveData &s
       return false;
     }
   }
+  return true;
 }
 
 bool KakuComponent::expect_dim(remote_base::RemoteReceiveData &src) const {
@@ -91,6 +97,8 @@ bool KakuComponent::expect_dim(remote_base::RemoteReceiveData &src) const {
     return false;
   if (!src.peek_space(250))
     return false;
+  src.advance(4);
+  return true;
 }
 
 bool KakuComponent::expect_one_manchester(remote_base::RemoteReceiveData &src) const {
@@ -104,7 +112,7 @@ bool KakuComponent::expect_zero_manchester(remote_base::RemoteReceiveData &src) 
 bool KakuComponent::expect_one(remote_base::RemoteReceiveData &src) const {
   if (!src.peek_mark(250))
     return false;
-  if (!src.peek_space(250))
+  if (!src.peek_space(250, 1))
     return false;
   src.advance(2);
   return true;
@@ -113,7 +121,7 @@ bool KakuComponent::expect_one(remote_base::RemoteReceiveData &src) const {
 bool KakuComponent::expect_zero(remote_base::RemoteReceiveData &src) const {
   if (!src.peek_mark(250))
     return false;
-  if (!src.peek_space(1250))
+  if (!src.peek_space(1250, 1))
     return false;
   src.advance(2);
   return true;

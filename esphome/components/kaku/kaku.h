@@ -3,9 +3,6 @@
 #include <esphome/components/light/light_output.h>
 #include <esphome/components/remote_base/remote_base.h>
 #include "esphome/core/component.h"
-#include "esphome/core/automation.h"
-#include "esphome/components/fan/fan_state.h"
-#include "esphome/components/cc1101/cc1101.h"
 
 namespace esphome {
 namespace kaku {
