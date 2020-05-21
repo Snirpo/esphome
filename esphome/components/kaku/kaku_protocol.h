@@ -4,7 +4,7 @@
 #include "esphome/components/cc1101/cc1101_reg.h"
 
 namespace esphome {
-namespace kaku_cc1101 {
+namespace kaku {
 
 using namespace cc1101;
 
