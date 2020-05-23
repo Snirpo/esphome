@@ -316,6 +316,9 @@
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/.idea/workspace.xml">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/.pio/build/project.checksum">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/.pre-commit-config.yaml">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
@@ -731,6 +734,18 @@
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/captive_portal/captive_portal.h">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/cc1101/__init__.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/cc1101/cc1101.cpp">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/cc1101/cc1101.h">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/cc1101/cc1101_reg.h">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/ccs811/__init__.py">
@@ -1417,6 +1432,9 @@
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/itho_ecofanrft/itho_cc1101_protocol.h">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/itho_ecofanrft/itho_ecofanrft.cpp">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/itho_ecofanrft/itho_ecofanrft.h">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
@@ -1430,6 +1448,36 @@
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/json/json_util.h">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku/__init__.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku/kaku.cpp">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku/kaku.h">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku/kaku_protocol.h">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku/light.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku_cc1101/__init__.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku_cc1101/kaku_cc1101.cpp">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku_cc1101/kaku_cc1101.h">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku_cc1101/kaku_protocol.h">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/kaku_cc1101/light.py">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/lcd_base/__init__.py">
@@ -4711,19 +4759,19 @@
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/json/json_util.h">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
-		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku_cc1101/__init__.py">
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku/__init__.py">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
-		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku_cc1101/kaku_cc1101.cpp">
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku/kaku.cpp">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
-		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku_cc1101/kaku_cc1101.h">
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku/kaku.h">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
-		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku_cc1101/kaku_protocol.h">
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku/kaku_protocol.h">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
-		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku_cc1101/light.py">
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/kaku/light.py">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/lcd_base/__init__.py">

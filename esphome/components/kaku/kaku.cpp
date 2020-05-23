@@ -32,6 +32,16 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
 
   ESP_LOGVV(TAG, "Sync found");
 
+  //  uint8_t tmp = 0;
+  //  if (!set_bits(data, tmp)) {
+  //    return false;
+  //  }
+
+  //  ESP_LOGD(TAG, "DATA");
+  //  for (auto i = 0; i<64; i++) {
+  //    ESP_LOGD(TAG, "%d", data.peek(i));
+  //  }
+
   // address
   uint32_t address = 0;
   if (!set_bits(data, address, 26))
@@ -39,43 +49,40 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
 
   ESP_LOGD(TAG, "Address: %d", address);
 
-  // group bit
-  uint8_t group = 0;
-  if (!set_bits(data, group))
-    return false;
+  if (!expect_dim(data)) {
+    // group bit
+    uint8_t group = 0;
+    if (!set_bits(data, group))
+      return false;
 
-  ESP_LOGD(TAG, "Group: %d", group);
+    ESP_LOGD(TAG, "Group: %d", group);
 
-  for (auto i = 0; i<16; i++) {
-    ESP_LOGD(TAG, "NEXT %d", data.peek(i));
-  }
+    bool on = false;
+    if (!set_bits(data, on))
+      return false;
 
-  bool dim = false;
-  bool on = false;
-  if (expect_dim(data)) {
-    dim = true;
-  } else if (!set_bits(data, on)) {
-    return false;
-  }
-
-  if (dim) {
-    ESP_LOGD(TAG, "Dim");
+    ESP_LOGD(TAG, "On/off: %s", on ? "on" : "off");
   } else {
-    ESP_LOGD(TAG, "On/off/dim: %s", on ? "on" : "off");
+    ESP_LOGD(TAG, "Dim found");
   }
 
   uint8_t unit = 0;
-  if (!set_bits(data, unit, 4))
+  if (!set_bits(data, unit, 2))
     return false;
 
   ESP_LOGD(TAG, "Unit: %d", unit);
 
-  uint8_t dim_val = 0;
-  if (dim) {
-    if (!set_bits(data, dim_val, 4))
-      return false;
-    ESP_LOGD(TAG, "Dim: %d", dim_val);
-  }
+  uint8_t button_code = 0;
+  if (!set_bits(data, button_code, 2))
+    return false;
+
+  ESP_LOGD(TAG, "Button code: %d", button_code);
+
+  uint8_t dim = 0;
+  if (!set_bits(data, dim, 4))
+    return false;
+
+  ESP_LOGD(TAG, "Dim level: %d", dim);
 
   return true;
 }
@@ -122,22 +129,16 @@ void KakuComponent::zero_manchester(remote_base::RemoteTransmitData &src) const 
 }
 
 bool KakuComponent::expect_dim(remote_base::RemoteReceiveData &src) const {
-  if (!src.peek_space(250))
-    return false;
+  for (auto i = 0; i < 4; i++) {
+    auto index = i * 2;
+    
+    if (!src.peek_mark(250, index))
+      return false;
 
-  if (!src.peek_mark(500))
-    return false;
-
-  if (!src.peek_space(500))
-    return false;
-
-  if (!src.peek_mark(500))
-    return false;
-
-  if (!src.peek_space(250))
-    return false;
-
-  src.advance(5);
+    if (!src.peek_space(250, index + 1))
+      return false;
+  }
+  src.advance(8);
   return true;
 }
 
