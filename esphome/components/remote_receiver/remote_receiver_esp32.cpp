@@ -48,6 +48,10 @@ void RemoteReceiverComponent::setup() {
     this->mark_failed();
     return;
   }
+
+  if (cc1101_) {
+    cc1101_->receive();
+  }
 }
 void RemoteReceiverComponent::dump_config() {
   ESP_LOGCONFIG(TAG, "Remote Receiver:");

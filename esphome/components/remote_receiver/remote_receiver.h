@@ -1,5 +1,6 @@
 #pragma once
 
+#include <esphome/components/cc1101/cc1101.h>
 #include "esphome/core/component.h"
 #include "esphome/components/remote_base/remote_base.h"
 
@@ -26,6 +27,7 @@ struct RemoteReceiverComponentStore {
 #endif
 
 class RemoteReceiverComponent : public remote_base::RemoteReceiverBase,
+                                public cc1101::CC1101Device,
                                 public Component
 #ifdef ARDUINO_ARCH_ESP32
     ,

@@ -8,19 +8,29 @@ from esphome.components.remote_base import CONF_RECEIVER_ID, CONF_TRANSMITTER_ID
 kaku_ns = cg.esphome_ns.namespace('kaku')
 KakuComponent = kaku_ns.class_('KakuComponent', light.LightOutput, remote_base.RemoteReceiverListener, cg.Component)
 
-DEPENDENCIES = ['remote_receiver']
+DEPENDENCIES = ['remote_receiver', 'remote_transmitter']
+
+CONF_ADDRESS = "address"
+CONF_UNIT = "unit"
 
 CONFIG_SCHEMA = light.BRIGHTNESS_ONLY_LIGHT_SCHEMA.extend({
     cv.GenerateID(CONF_OUTPUT_ID): cv.declare_id(KakuComponent),
     cv.GenerateID(CONF_RECEIVER_ID): cv.use_id(RemoteReceiverBase),
-    # cv.GenerateID(CONF_TRANSMITTER_ID): cv.use_id(RemoteTransmitterBase)
+    cv.GenerateID(CONF_TRANSMITTER_ID): cv.use_id(RemoteTransmitterBase),
+    cv.Required(CONF_ADDRESS): cv.uint32_t,
+    cv.Required(CONF_UNIT): cv.uint8_t
 }).extend(cv.COMPONENT_SCHEMA)
 
 
 def to_code(config):
     var = cg.new_Pvariable(config[CONF_OUTPUT_ID])
+    cg.add(var.set_address(config[CONF_ADDRESS]))
+    cg.add(var.set_unit(config[CONF_UNIT]))
     yield cg.register_component(var, config)
-    # transmitter = yield cg.get_variable(config[CONF_TRANSMITTER_ID])
+
+    # TODO: move?
+    transmitter = yield cg.get_variable(config[CONF_TRANSMITTER_ID])
+    cg.add(var.set_transmitter(transmitter))
 
     yield remote_base.register_listener(var, config)
     yield light.register_light(var, config)

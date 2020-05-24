@@ -54,6 +54,10 @@ void RemoteReceiverComponent::setup() {
     s.buffer_write_at = s.buffer_read_at = 0;
   }
   this->pin_->attach_interrupt(RemoteReceiverComponentStore::gpio_intr, &this->store_, CHANGE);
+
+  if (cc1101_) {
+    cc1101_->receive();
+  }
 }
 void RemoteReceiverComponent::dump_config() {
   ESP_LOGCONFIG(TAG, "Remote Receiver:");

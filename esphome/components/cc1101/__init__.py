@@ -9,6 +9,7 @@ DEPENDENCIES = ['spi']
 
 cc1101_ns = cg.esphome_ns.namespace('cc1101')
 CC1101Component = cc1101_ns.class_('CC1101Component', cg.Component, spi.SPIDevice)
+CC1101Device = cc1101_ns.class_('CC1101Device')
 
 CONF_IRQ_PIN = 'irq_pin'
 CONF_SERIAL = 'serial'

@@ -71,6 +71,11 @@ void RemoteTransmitterComponent::configure_rmt() {
 }
 
 void RemoteTransmitterComponent::send_internal(uint32_t send_times, uint32_t send_wait) {
+  // Switch to send mode
+  if (cc1101_) {
+    cc1101_->send();
+  }
+
   if (this->is_failed())
     return;
 
@@ -124,6 +129,11 @@ void RemoteTransmitterComponent::send_internal(uint32_t send_times, uint32_t sen
       delay(send_wait / 1000UL);
       delayMicroseconds(send_wait % 1000UL);
     }
+  }
+
+  // Back to receive mode
+  if (cc1101_) {
+    cc1101_->receive();
   }
 }
 

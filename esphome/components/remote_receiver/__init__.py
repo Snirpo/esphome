@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import pins
-from esphome.components import remote_base
+from esphome.components import remote_base, cc1101
 from esphome.const import CONF_BUFFER_SIZE, CONF_DUMP, CONF_FILTER, CONF_ID, CONF_IDLE, \
     CONF_PIN, CONF_TOLERANCE, CONF_MEMORY_BLOCKS
 from esphome.core import CORE
@@ -10,20 +10,25 @@ AUTO_LOAD = ['remote_base']
 remote_receiver_ns = cg.esphome_ns.namespace('remote_receiver')
 RemoteReceiverComponent = remote_receiver_ns.class_('RemoteReceiverComponent',
                                                     remote_base.RemoteReceiverBase,
+                                                    cc1101.CC1101Device,
                                                     cg.Component)
 
 MULTI_CONF = True
+
+CONF_USE_CC1101 = "use_cc1101"
+
 CONFIG_SCHEMA = remote_base.validate_triggers(cv.Schema({
     cv.GenerateID(): cv.declare_id(RemoteReceiverComponent),
     cv.Required(CONF_PIN): cv.All(pins.internal_gpio_input_pin_schema,
                                   pins.validate_has_interrupt),
+    cv.Optional(CONF_USE_CC1101, default=False): cv.boolean,
     cv.Optional(CONF_DUMP, default=[]): remote_base.validate_dumpers,
     cv.Optional(CONF_TOLERANCE, default=25): cv.All(cv.percentage_int, cv.Range(min=0)),
     cv.SplitDefault(CONF_BUFFER_SIZE, esp32='10000b', esp8266='1000b'): cv.validate_bytes,
     cv.Optional(CONF_FILTER, default='50us'): cv.positive_time_period_microseconds,
     cv.Optional(CONF_IDLE, default='10ms'): cv.positive_time_period_microseconds,
     cv.Optional(CONF_MEMORY_BLOCKS, default=3): cv.Range(min=1, max=8),
-}).extend(cv.COMPONENT_SCHEMA))
+}).extend(cc1101.C1101_DEVICE_SCHEMA).extend(cv.COMPONENT_SCHEMA))
 
 
 def to_code(config):
@@ -32,6 +37,9 @@ def to_code(config):
         var = cg.new_Pvariable(config[CONF_ID], pin, config[CONF_MEMORY_BLOCKS])
     else:
         var = cg.new_Pvariable(config[CONF_ID], pin)
+
+    if config[CONF_USE_CC1101]:
+        yield cc1101.register_c1101_device(var, config)
 
     yield remote_base.build_dumpers(config[CONF_DUMP])
     yield remote_base.build_triggers(config)

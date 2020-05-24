@@ -63,6 +63,11 @@ void RemoteTransmitterComponent::space_(uint32_t usec) {
   delay_microseconds_accurate(usec);
 }
 void RemoteTransmitterComponent::send_internal(uint32_t send_times, uint32_t send_wait) {
+  // Switch to send mode
+  if (cc1101_) {
+    cc1101_->send();
+  }
+
   ESP_LOGD(TAG, "Sending remote code...");
   uint32_t on_time, off_time;
   this->calculate_on_off_time_(this->temp_.get_carrier_frequency(), &on_time, &off_time);
@@ -84,6 +89,11 @@ void RemoteTransmitterComponent::send_internal(uint32_t send_times, uint32_t sen
     if (i + 1 < send_times) {
       delay_microseconds_accurate(send_wait);
     }
+  }
+
+  // Back to receive mode
+  if (cc1101_) {
+    cc1101_->receive();
   }
 }
 

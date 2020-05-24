@@ -17,8 +17,13 @@ class KakuComponent : public Component, public light::LightOutput, public remote
   bool on_receive(remote_base::RemoteReceiveData data) override;
 
   void set_transmitter(remote_base::RemoteTransmitterBase* t) { transmitter = t; }
+  void set_address(uint32_t a) { address = a; }
+  void set_unit(uint8_t u) { unit = u; }
 
  private:
+  uint32_t address;
+  uint8_t unit = 0;
+
   remote_base::RemoteTransmitterBase* transmitter{nullptr};
 
   bool expect_dim(remote_base::RemoteReceiveData& src) const;
@@ -35,7 +40,7 @@ class KakuComponent : public Component, public light::LightOutput, public remote
   void dim(remote_base::RemoteTransmitData& src) const;
   void one_manchester(remote_base::RemoteTransmitData& src) const;
   void zero_manchester(remote_base::RemoteTransmitData& src) const;
-  template<class T> void write_bits(remote_base::RemoteTransmitData& src, T& num, uint8_t size) const;
+  template<class T> void write_bits(remote_base::RemoteTransmitData& src, T num, uint8_t size) const;
 };
 
 }  // namespace kaku

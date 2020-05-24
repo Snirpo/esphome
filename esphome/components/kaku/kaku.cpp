@@ -18,9 +18,21 @@ light::LightTraits KakuComponent::get_traits() {
 }
 
 void KakuComponent::write_state(light::LightState *state) {
-  //  auto call = transmitter->transmit();
-  //  auto *data = call.get_data();
-  //  data->reset();
+  float brightness = 0;
+  state->current_values_as_brightness(&brightness);
+
+  auto call = transmitter->transmit();
+  auto *data = call.get_data();
+  data->reset();
+
+  sync(*data);
+  write_bits(*data, address, 26);
+  dim(*data);
+  write_bits(*data, unit, 2);
+  write_bits(*data, 0, 2);
+  write_bits(*data, (uint8_t) brightness * 15, 4);
+
+  call.perform();
 }
 
 bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
@@ -100,7 +112,7 @@ template<class T> bool KakuComponent::set_bits(remote_base::RemoteReceiveData &s
   return true;
 }
 
-template<class T> void KakuComponent::write_bits(remote_base::RemoteTransmitData &src, T &num, uint8_t size) const {
+template<class T> void KakuComponent::write_bits(remote_base::RemoteTransmitData &src, T num, uint8_t size) const {
   for (auto i = size - 1; i >= 0; i--) {
     if ((num >> i) & 1) {
       one_manchester(src);
@@ -131,7 +143,7 @@ void KakuComponent::zero_manchester(remote_base::RemoteTransmitData &src) const 
 bool KakuComponent::expect_dim(remote_base::RemoteReceiveData &src) const {
   for (auto i = 0; i < 4; i++) {
     auto index = i * 2;
-    
+
     if (!src.peek_mark(250, index))
       return false;
 
@@ -143,10 +155,10 @@ bool KakuComponent::expect_dim(remote_base::RemoteReceiveData &src) const {
 }
 
 void KakuComponent::dim(remote_base::RemoteTransmitData &src) const {
-  src.mark(250);
-  src.space(250);
-  src.mark(250);
-  src.space(250);
+  for (auto i = 0; i < 4; i++) {
+    src.mark(250);
+    src.space(250);
+  }
 }
 
 bool KakuComponent::expect_one(remote_base::RemoteReceiveData &src) const {
