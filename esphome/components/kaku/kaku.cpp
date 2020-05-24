@@ -54,6 +54,7 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
 
   ESP_LOGD(TAG, "Address: %d", address);
 
+  bool dim = false;
   if (!expect_dim(data)) {
     // group bit
     uint8_t group = 0;
@@ -68,6 +69,7 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
 
     ESP_LOGD(TAG, "On/off: %s", on ? "on" : "off");
   } else {
+    dim = true;
     ESP_LOGD(TAG, "Dim found");
   }
 
@@ -83,11 +85,13 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
   //
   //  ESP_LOGD(TAG, "Button code: %d", button_code);
 
-  uint8_t dim = 0;
-  if (!set_bits(data, dim, 4))
-    return false;
+  if (dim) {
+    uint8_t dim_value = 0;
+    if (!set_bits(data, dim_value, 4))
+      return false;
 
-  ESP_LOGD(TAG, "Dim level: %d", dim);
+    ESP_LOGD(TAG, "Dim level: %d", dim_value);
+  }
 
   return true;
 }
@@ -135,22 +139,15 @@ void KakuComponent::zero_manchester(remote_base::RemoteTransmitData &src) const 
 
 bool KakuComponent::expect_dim(remote_base::RemoteReceiveData &src) const {
   for (auto i = 0; i < 4; i++) {
-    auto index = i * 2;
-
-    if (!src.peek_mark(250, index))
-      return false;
-
-    if (!src.peek_space(250, index + 1))
+    if (!expect_zero(src))
       return false;
   }
-  src.advance(8);
   return true;
 }
 
 void KakuComponent::dim(remote_base::RemoteTransmitData &src) const {
   for (auto i = 0; i < 4; i++) {
-    src.mark(250);
-    src.space(250);
+    zero(src);
   }
 }
 
@@ -165,7 +162,7 @@ bool KakuComponent::expect_zero(remote_base::RemoteReceiveData &src) const {
 
 void KakuComponent::zero(remote_base::RemoteTransmitData &src) const {
   src.mark(250);
-  src.space(1250);
+  src.space(250);
 }
 
 bool KakuComponent::expect_one(remote_base::RemoteReceiveData &src) const {
@@ -179,7 +176,7 @@ bool KakuComponent::expect_one(remote_base::RemoteReceiveData &src) const {
 
 void KakuComponent::one(remote_base::RemoteTransmitData &src) const {
   src.mark(250);
-  src.space(250);
+  src.space(1250);
 }
 
 bool KakuComponent::expect_sync(remote_base::RemoteReceiveData &src) const {
