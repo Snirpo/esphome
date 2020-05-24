@@ -139,7 +139,7 @@ uint8_t CC1101Component::receive() {
   uint8_t marcstate = 0xFF;
   uint8_t counter = 0;
 
-  ESP_LOGVV(TAG, "CC1101 receive");
+  ESP_LOGD(TAG, "CC1101 receive");
 
   // this->sidle();
   // this->write_command_strobe(CC1101_SFRX);
@@ -152,7 +152,7 @@ uint8_t CC1101Component::receive() {
     yield();
     marcstate = (this->read_register(CC1101_MARCSTATE) & CC1101_BITS_MARCSTATE);
 
-    ESP_LOGVV(TAG, "CC1101 check MARCSTATE for RX (current state %02X)", marcstate);
+    ESP_LOGD(TAG, "CC1101 check MARCSTATE for RX (current state %02X)", marcstate);
 
     if (marcstate == CC1101_MARCSTATE_RXFIFO_OVERFLOW) {
       this->write_command_strobe(CC1101_SFRX);
@@ -174,7 +174,7 @@ uint8_t CC1101Component::send() {
   uint8_t marcstate = 0xFF;
   uint8_t counter = 0;
 
-  ESP_LOGVV(TAG, "CC1101 send");
+  ESP_LOGD(TAG, "CC1101 send");
 
   // this->sidle();
   // this->write_command_strobe(CC1101_SFRX);
@@ -187,7 +187,7 @@ uint8_t CC1101Component::send() {
     yield();
     marcstate = (this->read_register(CC1101_MARCSTATE) & CC1101_BITS_MARCSTATE);
 
-    ESP_LOGVV(TAG, "CC1101 check MARCSTATE for TX (current state %02X)", marcstate);
+    ESP_LOGD(TAG, "CC1101 check MARCSTATE for TX (current state %02X)", marcstate);
 
     if (++counter > 200) {
       ESP_LOGW(TAG, "CC1101 stuck, retry STX strobe");

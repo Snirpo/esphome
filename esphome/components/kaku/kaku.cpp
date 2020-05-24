@@ -18,13 +18,22 @@ void KakuComponent::send(uint32_t address, uint8_t unit, bool on, float brightne
 
   sync(*data);
   write_bits(*data, address, 26);
-  dim(*data);
+  // dim(*data);
+  write_bits(*data, 0, 1);
+  write_bits(*data, on, 1);
   write_bits(*data, unit, 4);
+  zero(*data);
   // write_bits(*data, 0, 2);
-  write_bits(*data, (uint8_t) brightness * 15, 4);
+  // write_bits(*data, (uint8_t) brightness * 15, 4);
 
-  call.set_send_wait(11000);
-  call.set_send_times(4);
+  ESP_LOGD(TAG, ">--- DATA");
+  for (const auto &n : data->get_data()) {
+    ESP_LOGD(TAG, "%d", n);
+  }
+  ESP_LOGD(TAG, "<--- DATA");
+
+  call.set_send_wait(10000);
+  call.set_send_times(5);
   call.perform();
 }
 
@@ -36,6 +45,12 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
     return false;
 
   ESP_LOGVV(TAG, "Sync found");
+
+  //  ESP_LOGD(TAG, ">--- DATA IN");
+  //  for (const auto n : *data.get_raw_data()) {
+  //    ESP_LOGD(TAG, "%d", n);
+  //  }
+  //  ESP_LOGD(TAG, "<--- DATA IN");
 
   //  uint8_t tmp = 0;
   //  if (!set_bits(data, tmp)) {
