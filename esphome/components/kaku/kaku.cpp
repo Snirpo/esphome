@@ -11,16 +11,7 @@ void KakuComponent::dump_config() {}
 
 float KakuComponent::get_setup_priority() const { return setup_priority::DATA; }
 
-light::LightTraits KakuComponent::get_traits() {
-  auto traits = light::LightTraits();
-  traits.set_supports_brightness(true);
-  return traits;
-}
-
-void KakuComponent::write_state(light::LightState *state) {
-  float brightness = 0;
-  state->current_values_as_brightness(&brightness);
-
+void KakuComponent::send(uint32_t address, uint8_t unit, bool on, float brightness) {
   auto call = transmitter->transmit();
   auto *data = call.get_data();
   data->reset();
@@ -28,10 +19,12 @@ void KakuComponent::write_state(light::LightState *state) {
   sync(*data);
   write_bits(*data, address, 26);
   dim(*data);
-  write_bits(*data, unit, 2);
-  write_bits(*data, 0, 2);
+  write_bits(*data, unit, 4);
+  // write_bits(*data, 0, 2);
   write_bits(*data, (uint8_t) brightness * 15, 4);
 
+  call.set_send_wait(11000);
+  call.set_send_times(4);
   call.perform();
 }
 
@@ -79,16 +72,16 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
   }
 
   uint8_t unit = 0;
-  if (!set_bits(data, unit, 2))
+  if (!set_bits(data, unit, 4))
     return false;
 
   ESP_LOGD(TAG, "Unit: %d", unit);
 
-  uint8_t button_code = 0;
-  if (!set_bits(data, button_code, 2))
-    return false;
-
-  ESP_LOGD(TAG, "Button code: %d", button_code);
+  //  uint8_t button_code = 0;
+  //  if (!set_bits(data, button_code, 2))
+  //    return false;
+  //
+  //  ESP_LOGD(TAG, "Button code: %d", button_code);
 
   uint8_t dim = 0;
   if (!set_bits(data, dim, 4))
@@ -123,7 +116,7 @@ template<class T> void KakuComponent::write_bits(remote_base::RemoteTransmitData
 }
 
 bool KakuComponent::expect_one_manchester(remote_base::RemoteReceiveData &src) const {
-  return expect_zero(src) && expect_one(src);
+  return expect_one(src) && expect_zero(src);
 }
 
 void KakuComponent::one_manchester(remote_base::RemoteTransmitData &src) const {
@@ -132,7 +125,7 @@ void KakuComponent::one_manchester(remote_base::RemoteTransmitData &src) const {
 }
 
 bool KakuComponent::expect_zero_manchester(remote_base::RemoteReceiveData &src) const {
-  return expect_one(src) && expect_zero(src);
+  return expect_zero(src) && expect_one(src);
 }
 
 void KakuComponent::zero_manchester(remote_base::RemoteTransmitData &src) const {
@@ -161,7 +154,7 @@ void KakuComponent::dim(remote_base::RemoteTransmitData &src) const {
   }
 }
 
-bool KakuComponent::expect_one(remote_base::RemoteReceiveData &src) const {
+bool KakuComponent::expect_zero(remote_base::RemoteReceiveData &src) const {
   if (!src.peek_mark(250))
     return false;
   if (!src.peek_space(250, 1))
@@ -170,12 +163,12 @@ bool KakuComponent::expect_one(remote_base::RemoteReceiveData &src) const {
   return true;
 }
 
-void KakuComponent::one(remote_base::RemoteTransmitData &src) const {
+void KakuComponent::zero(remote_base::RemoteTransmitData &src) const {
   src.mark(250);
-  src.space(250);
+  src.space(1250);
 }
 
-bool KakuComponent::expect_zero(remote_base::RemoteReceiveData &src) const {
+bool KakuComponent::expect_one(remote_base::RemoteReceiveData &src) const {
   if (!src.peek_mark(250))
     return false;
   if (!src.peek_space(1250, 1))
@@ -184,9 +177,9 @@ bool KakuComponent::expect_zero(remote_base::RemoteReceiveData &src) const {
   return true;
 }
 
-void KakuComponent::zero(remote_base::RemoteTransmitData &src) const {
+void KakuComponent::one(remote_base::RemoteTransmitData &src) const {
   src.mark(250);
-  src.space(1250);
+  src.space(250);
 }
 
 bool KakuComponent::expect_sync(remote_base::RemoteReceiveData &src) const {
@@ -201,6 +194,16 @@ bool KakuComponent::expect_sync(remote_base::RemoteReceiveData &src) const {
 void KakuComponent::sync(remote_base::RemoteTransmitData &src) const {
   src.mark(250);
   src.space(2500);
+}
+
+light::LightTraits KakuLightComponent::get_traits() {
+  auto traits = light::LightTraits();
+  traits.set_supports_brightness(true);
+  return traits;
+}
+
+void KakuLightComponent::write_state(light::LightState *state) {
+  parent->send(address, unit, state->current_values.is_on(), state->current_values.get_brightness());
 }
 
 }  // namespace kaku

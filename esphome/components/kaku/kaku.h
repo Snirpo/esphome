@@ -7,23 +7,17 @@
 namespace esphome {
 namespace kaku {
 
-class KakuComponent : public Component, public light::LightOutput, public remote_base::RemoteReceiverListener {
+class KakuComponent : public Component, public remote_base::RemoteReceiverListener {
  public:
   void dump_config() override;
   float get_setup_priority() const override;
 
-  light::LightTraits get_traits() override;
-  void write_state(light::LightState* state) override;
   bool on_receive(remote_base::RemoteReceiveData data) override;
+  void send(uint32_t address, uint8_t unit, bool on, float brightness);
 
   void set_transmitter(remote_base::RemoteTransmitterBase* t) { transmitter = t; }
-  void set_address(uint32_t a) { address = a; }
-  void set_unit(uint8_t u) { unit = u; }
 
  private:
-  uint32_t address;
-  uint8_t unit = 0;
-
   remote_base::RemoteTransmitterBase* transmitter{nullptr};
 
   bool expect_dim(remote_base::RemoteReceiveData& src) const;
@@ -41,6 +35,20 @@ class KakuComponent : public Component, public light::LightOutput, public remote
   void one_manchester(remote_base::RemoteTransmitData& src) const;
   void zero_manchester(remote_base::RemoteTransmitData& src) const;
   template<class T> void write_bits(remote_base::RemoteTransmitData& src, T num, uint8_t size) const;
+};
+
+class KakuLightComponent : public Component, public light::LightOutput {
+ public:
+  light::LightTraits get_traits() override;
+  void write_state(light::LightState* state) override;
+  void set_kaku_parent(KakuComponent* component) { parent = component; }
+  void set_address(uint32_t a) { address = a; }
+  void set_unit(uint8_t u) { unit = u; }
+
+ private:
+  KakuComponent* parent;
+  uint32_t address;
+  uint8_t unit = 0;
 };
 
 }  // namespace kaku
