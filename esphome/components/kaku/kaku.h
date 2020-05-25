@@ -7,6 +7,8 @@
 namespace esphome {
 namespace kaku {
 
+class KakuLightComponent;
+
 class KakuComponent : public Component, public remote_base::RemoteReceiverListener {
  public:
   void dump_config() override;
@@ -16,9 +18,11 @@ class KakuComponent : public Component, public remote_base::RemoteReceiverListen
   void send(uint32_t address, uint8_t unit, bool on, float brightness);
 
   void set_transmitter(remote_base::RemoteTransmitterBase* t) { transmitter = t; }
+  void register_light(KakuLightComponent* component) { lights.push_back(component); }
 
  private:
   remote_base::RemoteTransmitterBase* transmitter{nullptr};
+  std::vector<KakuLightComponent*> lights;
 
   bool expect_dim(remote_base::RemoteReceiveData& src) const;
   bool expect_one(remote_base::RemoteReceiveData& src) const;
@@ -39,16 +43,23 @@ class KakuComponent : public Component, public remote_base::RemoteReceiverListen
 
 class KakuLightComponent : public Component, public light::LightOutput {
  public:
+  void update_state(bool on);
+  void setup_state(light::LightState* state) override;
   light::LightTraits get_traits() override;
   void write_state(light::LightState* state) override;
-  void set_kaku_parent(KakuComponent* component) { parent = component; }
+  void set_kaku_parent(KakuComponent* component) {
+    parent = component;
+    component->register_light(this);
+  }
   void set_address(uint32_t a) { address = a; }
   void set_unit(uint8_t u) { unit = u; }
+  uint8_t get_unit() { return unit; }
 
  private:
   KakuComponent* parent;
   uint32_t address;
   uint8_t unit = 0;
+  light::LightState* state_;
 };
 
 }  // namespace kaku

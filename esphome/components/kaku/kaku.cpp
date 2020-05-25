@@ -18,13 +18,16 @@ void KakuComponent::send(uint32_t address, uint8_t unit, bool on, float brightne
 
   sync(*data);
   write_bits(*data, address, 26);
+  // write_bits(*data, 0, 1);
   // dim(*data);
+
+  // Non-dim
   write_bits(*data, 0, 1);
   write_bits(*data, on, 1);
+
   write_bits(*data, unit, 4);
-  zero(*data);
-  // write_bits(*data, 0, 2);
-  // write_bits(*data, (uint8_t) brightness * 15, 4);
+  write_bits(*data, (uint8_t) brightness * 15, 4);
+  zero_manchester(*data);
 
   ESP_LOGD(TAG, ">--- DATA");
   for (const auto &n : data->get_data()) {
@@ -33,7 +36,7 @@ void KakuComponent::send(uint32_t address, uint8_t unit, bool on, float brightne
   ESP_LOGD(TAG, "<--- DATA");
 
   call.set_send_wait(10000);
-  call.set_send_times(5);
+  call.set_send_times(4);
   call.perform();
 }
 
@@ -69,24 +72,24 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
 
   ESP_LOGD(TAG, "Address: %d", address);
 
-  bool dim = false;
-  if (!expect_dim(data)) {
-    // group bit
-    uint8_t group = 0;
-    if (!set_bits(data, group))
-      return false;
+  //  bool dim = false;
+  //  if (!expect_dim(data)) {
+  // group bit
+  uint8_t group = 0;
+  if (!set_bits(data, group))
+    return false;
 
-    ESP_LOGD(TAG, "Group: %d", group);
+  ESP_LOGD(TAG, "Group: %d", group);
 
-    bool on = false;
-    if (!set_bits(data, on))
-      return false;
+  bool on = false;
+  if (!set_bits(data, on))
+    return false;
 
-    ESP_LOGD(TAG, "On/off: %s", on ? "on" : "off");
-  } else {
-    dim = true;
-    ESP_LOGD(TAG, "Dim found");
-  }
+  ESP_LOGD(TAG, "On/off: %s", on ? "on" : "off");
+  //  } else {
+  //    dim = true;
+  //    ESP_LOGD(TAG, "Dim found");
+  //  }
 
   uint8_t unit = 0;
   if (!set_bits(data, unit, 4))
@@ -100,12 +103,19 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
   //
   //  ESP_LOGD(TAG, "Button code: %d", button_code);
 
-  if (dim) {
-    uint8_t dim_value = 0;
-    if (!set_bits(data, dim_value, 4))
-      return false;
+  //  if (dim) {
+  //    uint8_t dim_value = 0;
+  //    if (!set_bits(data, dim_value, 4))
+  //      return false;
+  //
+  //    ESP_LOGD(TAG, "Dim level: %d", dim_value);
+  //  }
 
-    ESP_LOGD(TAG, "Dim level: %d", dim_value);
+  for (auto *light : lights) {
+    if (light->get_unit() == unit) {
+      light->update_state(on);
+      break;
+    }
   }
 
   return true;
@@ -154,9 +164,14 @@ void KakuComponent::zero_manchester(remote_base::RemoteTransmitData &src) const 
 
 bool KakuComponent::expect_dim(remote_base::RemoteReceiveData &src) const {
   for (auto i = 0; i < 4; i++) {
-    if (!expect_zero(src))
+    auto index = i * 2;
+
+    if (!src.peek_mark(250, index))
+      return false;
+    if (!src.peek_space(250, index + 1))
       return false;
   }
+  src.advance(8);
   return true;
 }
 
@@ -208,9 +223,17 @@ void KakuComponent::sync(remote_base::RemoteTransmitData &src) const {
   src.space(2500);
 }
 
+void KakuLightComponent::setup_state(light::LightState *state) { this->state_ = state; }
+
+void KakuLightComponent::update_state(bool on) {
+  auto call = this->state_->make_call();
+  call.set_state(on);
+  call.perform();
+}
+
 light::LightTraits KakuLightComponent::get_traits() {
   auto traits = light::LightTraits();
-  traits.set_supports_brightness(true);
+  traits.set_supports_brightness(false);
   return traits;
 }
 
