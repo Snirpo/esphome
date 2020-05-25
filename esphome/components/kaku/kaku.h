@@ -60,6 +60,7 @@ class KakuLightComponent : public Component, public light::LightOutput {
   uint32_t address;
   uint8_t unit = 0;
   light::LightState* state_;
+  bool ignore = false;
 };
 
 }  // namespace kaku

@@ -18,22 +18,27 @@ void KakuComponent::send(uint32_t address, uint8_t unit, bool on, float brightne
 
   sync(*data);
   write_bits(*data, address, 26);
-  // write_bits(*data, 0, 1);
-  // dim(*data);
+  write_bits(*data, 0, 1);  // ignore group
 
-  // Non-dim
-  write_bits(*data, 0, 1);
-  write_bits(*data, on, 1);
+  if (on) {
+    dim(*data);
+  } else {
+    write_bits(*data, 0, 1);
+  }
 
   write_bits(*data, unit, 4);
-  write_bits(*data, (uint8_t) brightness * 15, 4);
+
+  if (on) {
+    write_bits(*data, (uint8_t)(brightness * 15.0f), 4);
+  }
+
   zero_manchester(*data);
 
-  ESP_LOGD(TAG, ">--- DATA");
+  ESP_LOGVV(TAG, ">--- DATA");
   for (const auto &n : data->get_data()) {
-    ESP_LOGD(TAG, "%d", n);
+    ESP_LOGVV(TAG, "%d", n);
   }
-  ESP_LOGD(TAG, "<--- DATA");
+  ESP_LOGVV(TAG, "<--- DATA");
 
   call.set_send_wait(10000);
   call.set_send_times(4);
@@ -75,7 +80,7 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
   //  bool dim = false;
   //  if (!expect_dim(data)) {
   // group bit
-  uint8_t group = 0;
+  bool group = false;
   if (!set_bits(data, group))
     return false;
 
@@ -111,10 +116,16 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
   //    ESP_LOGD(TAG, "Dim level: %d", dim_value);
   //  }
 
-  for (auto *light : lights) {
-    if (light->get_unit() == unit) {
+  if (group) {
+    for (auto *light : lights) {
       light->update_state(on);
-      break;
+    }
+  } else {
+    for (auto *light : lights) {
+      if (light->get_unit() == unit) {
+        light->update_state(on);
+        break;
+      }
     }
   }
 
@@ -176,9 +187,8 @@ bool KakuComponent::expect_dim(remote_base::RemoteReceiveData &src) const {
 }
 
 void KakuComponent::dim(remote_base::RemoteTransmitData &src) const {
-  for (auto i = 0; i < 4; i++) {
-    zero(src);
-  }
+  zero(src);
+  zero(src);
 }
 
 bool KakuComponent::expect_zero(remote_base::RemoteReceiveData &src) const {
@@ -229,16 +239,20 @@ void KakuLightComponent::update_state(bool on) {
   auto call = this->state_->make_call();
   call.set_state(on);
   call.perform();
+  ignore = true;
 }
 
 light::LightTraits KakuLightComponent::get_traits() {
   auto traits = light::LightTraits();
-  traits.set_supports_brightness(false);
+  traits.set_supports_brightness(true);
   return traits;
 }
 
 void KakuLightComponent::write_state(light::LightState *state) {
-  parent->send(address, unit, state->current_values.is_on(), state->current_values.get_brightness());
+  if (!ignore) {
+    parent->send(address, unit, state->current_values.is_on(), state->current_values.get_brightness());
+  }
+  ignore = false;
 }
 
 }  // namespace kaku
