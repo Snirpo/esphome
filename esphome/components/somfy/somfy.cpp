@@ -16,18 +16,15 @@ static const char *TAG = "somfy";
 
 void SomfyComponent::dump_config() {}
 
-void SomfyComponent::setup() {
-  this->rolling_code_pref = global_preferences.make_preference<uint16_t>(this->get_object_id_hash(), true);
-  if (!rolling_code_pref.is_initialized()) {
-    uint16_t val = 0;
-    rolling_code_pref.save(&val);
-  }
-}
+void SomfyComponent::setup() {}
 
 float SomfyComponent::get_setup_priority() const { return setup_priority::DATA; }
 
-void SomfyComponent::send(uint32_t address, const cover::CoverCall &call) {
-  auto frame = build_frame(address, call.get_stop() ? STOP : (call.get_position() == cover::COVER_OPEN ? DOWN : UP));
+uint32_t SomfyComponent::hash_base() { return 3104134497UL; }
+
+void SomfyComponent::send(uint32_t address, uint16_t code, const cover::CoverCall &call) {
+  auto frame =
+      build_frame(address, code, call.get_stop() ? STOP : (call.get_position() == cover::COVER_OPEN ? DOWN : UP));
 
   send_command(frame, true);
   send_command(frame, false, 2);
@@ -77,10 +74,7 @@ void SomfyComponent::send_command(std::array<uint8_t, 7> frame, bool first, uint
   call.perform();
 }
 
-std::array<uint8_t, 7> SomfyComponent::build_frame(uint32_t address, uint8_t command) {
-  uint16_t code;
-  rolling_code_pref.load(&code);
-
+std::array<uint8_t, 7> SomfyComponent::build_frame(uint32_t address, uint16_t code, uint8_t command) {
   auto frame = std::array<uint8_t, 7>();
   frame[0] = 0xA7;           // Encryption key. Doesn't matter much
   frame[1] = command << 4;   // Which button did  you press? The 4 LSB will be the checksum
@@ -112,10 +106,26 @@ std::array<uint8_t, 7> SomfyComponent::build_frame(uint32_t address, uint8_t com
   ESP_LOGVV(TAG, "Obfuscated frame: %02X:%02X:%02X:%02X:%02X:%02X:%02X", frame[0], frame[1], frame[2], frame[3],
             frame[4], frame[5], frame[6]);
 
-  ESP_LOGD(TAG, "Rolling code: %d", code);
+  ESP_LOGD(TAG, "Sending from address %d with rolling code: %d", address, code);
 
-  code++;
-  rolling_code_pref.save(&code);
+  return frame;
+}
+
+void SomfyComponent::prog(uint32_t address, uint16_t code) {
+  auto frame = build_frame(address, code, PROG);
+
+  send_command(frame, true);
+  send_command(frame, false, 2);
+}
+
+void SomfyCoverComponent::setup() {
+  this->rolling_code_pref = global_preferences.make_preference<uint16_t>(this->get_object_id_hash(), true);
+  uint16_t code = 1;
+  if (!rolling_code_pref.load(&code)) {
+    if (!rolling_code_pref.save(&code)) {
+      return mark_failed();
+    }
+  }
 }
 
 cover::CoverTraits SomfyCoverComponent::get_traits() {
@@ -123,9 +133,23 @@ cover::CoverTraits SomfyCoverComponent::get_traits() {
   return traits;
 }
 
-void SomfyCoverComponent::control(const cover::CoverCall &call) { parent->send(address, call); }
+void SomfyCoverComponent::control(const cover::CoverCall &call) {
+  uint16_t code;
+  rolling_code_pref.load(&code);
+  code++;
+
+  parent->send(address, code, call);
+
+  rolling_code_pref.save(&code);
+}
 
 std::string SomfyCoverComponent::device_class() { return "blind"; }
+
+void SomfyCoverComponent::prog() {
+  uint16_t code = 1;
+  parent->prog(address, code);
+  rolling_code_pref.save(&code);
+}
 
 }  // namespace somfy
 }  // namespace esphome
