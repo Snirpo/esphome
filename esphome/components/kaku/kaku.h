@@ -33,6 +33,7 @@ class KakuComponent : public Component, public remote_base::RemoteReceiverListen
   template<class T> bool set_bits(remote_base::RemoteReceiveData& src, T& data, uint8_t size = 1) const;
 
   void sync(remote_base::RemoteTransmitData& src) const;
+  void pause(remote_base::RemoteTransmitData& src) const;
   void one(remote_base::RemoteTransmitData& src) const;
   void zero(remote_base::RemoteTransmitData& src) const;
   void dim(remote_base::RemoteTransmitData& src) const;

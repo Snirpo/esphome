@@ -32,7 +32,7 @@ void KakuComponent::send(uint32_t address, uint8_t unit, bool on, float brightne
     write_bits(*data, (uint8_t)(brightness * 15.0f), 4);
   }
 
-  zero_manchester(*data);
+  pause(*data);
 
   ESP_LOGVV(TAG, ">--- DATA");
   for (const auto &n : data->get_data()) {
@@ -40,7 +40,6 @@ void KakuComponent::send(uint32_t address, uint8_t unit, bool on, float brightne
   }
   ESP_LOGVV(TAG, "<--- DATA");
 
-  call.set_send_wait(10000);
   call.set_send_times(4);
   call.perform();
 }
@@ -231,6 +230,11 @@ bool KakuComponent::expect_sync(remote_base::RemoteReceiveData &src) const {
 void KakuComponent::sync(remote_base::RemoteTransmitData &src) const {
   src.mark(250);
   src.space(2500);
+}
+
+void KakuComponent::pause(remote_base::RemoteTransmitData &src) const {
+  src.mark(250);
+  src.space(40 * 250);
 }
 
 void KakuLightComponent::setup_state(light::LightState *state) { this->state_ = state; }
