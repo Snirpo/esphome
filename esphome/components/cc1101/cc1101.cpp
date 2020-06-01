@@ -38,14 +38,6 @@ void CC1101Component::setup() {
   delayMicroseconds(100);
 
   if (serial) {
-    for (register_setting r : SERIAL_CONFIG) {
-      this->write_register(r.address, r.data);
-    }
-    this->write_burst_register(CC1101_PATABLE, SERIAL_PATABLE);
-
-    this->write_command_strobe(CC1101_SCAL);
-    delay(1);
-
     // Default in receive mode
     receive();
   } else if (this->irq_pin_) {
@@ -136,6 +128,18 @@ void CC1101Component::flush_txfifo() {
 }
 
 uint8_t CC1101Component::receive() {
+  // TODO: default settings, move
+  this->reset_();
+
+  for (register_setting r : SERIAL_CONFIG) {
+    this->write_register(r.address, r.data);
+  }
+  this->write_burst_register(CC1101_PATABLE, SERIAL_PATABLE);
+
+  this->write_command_strobe(CC1101_SCAL);
+  delay(1);
+  //
+
   uint8_t marcstate = 0xFF;
   uint8_t counter = 0;
 
@@ -168,6 +172,19 @@ uint8_t CC1101Component::receive() {
     }
   }
   return marcstate;
+}
+
+uint8_t CC1101Component::send(const std::vector<register_setting> &settings, const std::vector<uint8_t> &patable) {
+  this->reset_();
+  // Set settings
+  for (cc1101::register_setting r : settings) {
+    this->write_register(r.address, r.data);
+  }
+  this->write_burst_register(CC1101_PATABLE, patable);
+  this->write_command_strobe(CC1101_SCAL);
+  delay(1);
+
+  send();
 }
 
 uint8_t CC1101Component::send() {

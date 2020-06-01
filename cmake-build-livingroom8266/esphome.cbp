@@ -2467,6 +2467,18 @@
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/sntp/time.py">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/somfy/__init__.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/somfy/cover.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/somfy/somfy.cpp">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/somfy/somfy.h">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/build/lib/esphome/components/speed/__init__.py">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
@@ -3631,6 +3643,9 @@
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome.egg-info/top_level.txt">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/.DS_Store">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/__init__.py">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
@@ -3662,6 +3677,9 @@
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/codegen.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/.DS_Store">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/__init__.py">
@@ -5759,6 +5777,18 @@
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/sntp/time.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/somfy/__init__.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/somfy/cover.py">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/somfy/somfy.cpp">
+			<Option target="Z_DUMMY_TARGET"/>
+		</Unit>
+		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/somfy/somfy.h">
 			<Option target="Z_DUMMY_TARGET"/>
 		</Unit>
 		<Unit filename="/Users/chielprins/CLionProjects/esphome/esphome/components/speed/__init__.py">

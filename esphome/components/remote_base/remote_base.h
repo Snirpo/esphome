@@ -14,6 +14,12 @@
 namespace esphome {
 namespace remote_base {
 
+class RemoteConfigurer {
+ public:
+  virtual void send() = 0;
+  virtual void receive() = 0;
+};
+
 class RemoteTransmitData {
  public:
   void mark(uint32_t length) { this->data_.push_back(length); }
@@ -181,22 +187,27 @@ class RemoteTransmitterBase : public RemoteComponentBase {
   RemoteTransmitterBase(GPIOPin *pin) : RemoteComponentBase(pin) {}
   class TransmitCall {
    public:
-    explicit TransmitCall(RemoteTransmitterBase *parent) : parent_(parent) {}
+    explicit TransmitCall(RemoteTransmitterBase *parent, RemoteConfigurer *c) : parent_(parent), configurer(c) {}
     RemoteTransmitData *get_data() { return &this->parent_->temp_; }
     void set_send_times(uint32_t send_times) { send_times_ = send_times; }
     void set_send_wait(uint32_t send_wait) { send_wait_ = send_wait; }
 
-    void perform() { this->parent_->send_(this->send_times_, this->send_wait_); }
+    void perform() {
+      configurer->send();
+      this->parent_->send_(this->send_times_, this->send_wait_);
+      configurer->receive();
+    }
 
    protected:
     RemoteTransmitterBase *parent_;
+    RemoteConfigurer *configurer;
     uint32_t send_times_{1};
     uint32_t send_wait_{0};
   };
 
-  TransmitCall transmit() {
+  TransmitCall transmit(RemoteConfigurer *c) {
     this->temp_.reset();
-    return TransmitCall(this);
+    return TransmitCall(this, c);
   }
 
  protected:

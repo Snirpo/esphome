@@ -31,7 +31,7 @@ void SomfyComponent::send(uint32_t address, uint16_t code, const cover::CoverCal
 }
 
 void SomfyComponent::send_command(std::array<uint8_t, 7> frame, bool first, uint8_t count) {
-  auto call = transmitter->transmit();
+  auto call = transmitter->transmit(configurer);
   auto *data = call.get_data();
   data->reset();
 
@@ -150,6 +150,10 @@ void SomfyCoverComponent::prog() {
   parent->prog(address, code);
   rolling_code_pref.save(&code);
 }
+
+void SomfyCC1101Configurer::send() { cc1101->send(SOMFY_C1101_CONFIG, SOMFY_CC1101_PATABLE); }
+
+void SomfyCC1101Configurer::receive() { cc1101->receive(); }
 
 }  // namespace somfy
 }  // namespace esphome
