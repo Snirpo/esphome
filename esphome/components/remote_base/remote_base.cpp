@@ -26,7 +26,7 @@ void RemoteRMTChannel::config_rmt(rmt_config_t &rmt) {
 
 void RemoteReceiverBinarySensorBase::dump_config() { LOG_BINARY_SENSOR("", "Remote Receiver Binary Sensor", this); }
 
-void RemoteTransmitterBase::send_(uint32_t send_times, uint32_t send_wait) {
+void RemoteTransmitterBase::send_(uint32_t send_times, uint32_t send_wait, RemoteConfigurer *c) {
 #ifdef ESPHOME_LOG_HAS_VERY_VERBOSE
   const std::vector<int32_t> &vec = this->temp_.get_data();
   char buffer[256];
@@ -63,7 +63,9 @@ void RemoteTransmitterBase::send_(uint32_t send_times, uint32_t send_wait) {
     ESP_LOGVV(TAG, "%s", buffer);
   }
 #endif
+  c->send(this->cc1101_);
   this->send_internal(send_times, send_wait);
+  c->receive(this->cc1101_);
 }
 }  // namespace remote_base
 }  // namespace esphome

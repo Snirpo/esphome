@@ -184,7 +184,7 @@ uint8_t CC1101Component::send(const std::vector<register_setting> &settings, con
   this->write_command_strobe(CC1101_SCAL);
   delay(1);
 
-  send();
+  return send();
 }
 
 uint8_t CC1101Component::send() {

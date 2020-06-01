@@ -6,19 +6,15 @@
 #include "esphome/core/esphal.h"
 #include "esphome/core/automation.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
+#include "esphome/components/cc1101/cc1101.h"
 
 #ifdef ARDUINO_ARCH_ESP32
 #include <driver/rmt.h>
 #endif
 
 namespace esphome {
-namespace remote_base {
 
-class RemoteConfigurer {
- public:
-  virtual void send() = 0;
-  virtual void receive() = 0;
-};
+namespace remote_base {
 
 class RemoteTransmitData {
  public:
@@ -182,7 +178,13 @@ class RemoteRMTChannel {
 };
 #endif
 
-class RemoteTransmitterBase : public RemoteComponentBase {
+class RemoteConfigurer {
+ public:
+  virtual void send(cc1101::CC1101Component *component) = 0;
+  virtual void receive(cc1101::CC1101Component *component) = 0;
+};
+
+class RemoteTransmitterBase : public RemoteComponentBase, public cc1101::CC1101Device {
  public:
   RemoteTransmitterBase(GPIOPin *pin) : RemoteComponentBase(pin) {}
   class TransmitCall {
@@ -192,11 +194,7 @@ class RemoteTransmitterBase : public RemoteComponentBase {
     void set_send_times(uint32_t send_times) { send_times_ = send_times; }
     void set_send_wait(uint32_t send_wait) { send_wait_ = send_wait; }
 
-    void perform() {
-      configurer->send();
-      this->parent_->send_(this->send_times_, this->send_wait_);
-      configurer->receive();
-    }
+    void perform() { this->parent_->send_(this->send_times_, this->send_wait_, this->configurer); }
 
    protected:
     RemoteTransmitterBase *parent_;
@@ -211,9 +209,9 @@ class RemoteTransmitterBase : public RemoteComponentBase {
   }
 
  protected:
-  void send_(uint32_t send_times, uint32_t send_wait);
+  void send_(uint32_t send_times, uint32_t send_wait, RemoteConfigurer *c);
   virtual void send_internal(uint32_t send_times, uint32_t send_wait) = 0;
-  void send_single_() { this->send_(1, 0); }
+  // void send_single_() { this->send_(1, 0); }
 
   /// Use same vector for all transmits, avoids many allocations
   RemoteTransmitData temp_;

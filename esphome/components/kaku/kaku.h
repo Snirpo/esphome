@@ -9,6 +9,11 @@ namespace kaku {
 
 class KakuLightComponent;
 
+class KakuRemoteConfigurer : public remote_base::RemoteConfigurer {
+  void receive(cc1101::CC1101Component* component) override;
+  void send(cc1101::CC1101Component* component) override;
+};
+
 class KakuComponent : public Component, public remote_base::RemoteReceiverListener {
  public:
   void dump_config() override;
@@ -21,6 +26,7 @@ class KakuComponent : public Component, public remote_base::RemoteReceiverListen
   void register_light(KakuLightComponent* component) { lights.push_back(component); }
 
  private:
+  KakuRemoteConfigurer* configurer = new KakuRemoteConfigurer();
   remote_base::RemoteTransmitterBase* transmitter{nullptr};
   std::vector<KakuLightComponent*> lights;
 

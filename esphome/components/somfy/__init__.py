@@ -34,7 +34,3 @@ def to_code(config):
     # TODO: move?
     transmitter = yield cg.get_variable(config[CONF_TRANSMITTER_ID])
     cg.add(var.set_transmitter(transmitter))
-
-    # TODO: not hardcoded
-    cc1101 = yield cg.get_variable(config[CONF_CC1101_ID])
-    cg.add(var.set_configurer(cc1101))

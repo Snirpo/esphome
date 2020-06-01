@@ -151,9 +151,11 @@ void SomfyCoverComponent::prog() {
   rolling_code_pref.save(&code);
 }
 
-void SomfyCC1101Configurer::send() { cc1101->send(SOMFY_C1101_CONFIG, SOMFY_CC1101_PATABLE); }
+void SomfyRemoteConfigurer::send(cc1101::CC1101Component *component) {
+  component->send(SOMFY_C1101_CONFIG, SOMFY_CC1101_PATABLE);
+}
 
-void SomfyCC1101Configurer::receive() { cc1101->receive(); }
+void SomfyRemoteConfigurer::receive(cc1101::CC1101Component *component) { component->receive(); }
 
 }  // namespace somfy
 }  // namespace esphome

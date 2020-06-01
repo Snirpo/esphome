@@ -2,7 +2,6 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/spi/spi.h"
-#include "esphome/components/remote_base/remote_base.h"
 #include "cc1101_reg.h"
 
 namespace esphome {
@@ -74,14 +73,6 @@ class CC1101Device {
 
  protected:
   CC1101Component *cc1101_{nullptr};
-};
-
-class CC1101Configurer : public remote_base::RemoteConfigurer {
- public:
-  void set_cc1101(CC1101Component *component) { this->cc1101 = component; }
-
- protected:
-  CC1101Component *cc1101;
 };
 
 }  // namespace cc1101

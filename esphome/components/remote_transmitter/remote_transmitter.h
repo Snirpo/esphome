@@ -8,7 +8,6 @@ namespace esphome {
 namespace remote_transmitter {
 
 class RemoteTransmitterComponent : public remote_base::RemoteTransmitterBase,
-                                   public cc1101::CC1101Device,
                                    public Component
 #ifdef ARDUINO_ARCH_ESP32
     ,

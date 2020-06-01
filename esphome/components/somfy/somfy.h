@@ -28,10 +28,10 @@ static const std::vector<cc1101::register_setting> SOMFY_C1101_CONFIG{
 
 static const std::vector<uint8_t> SOMFY_CC1101_PATABLE = {0x00, 0x1D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-class SomfyCC1101Configurer : public cc1101::CC1101Configurer {
+class SomfyRemoteConfigurer : public remote_base::RemoteConfigurer {
  public:
-  void receive() override;
-  void send() override;
+  void receive(cc1101::CC1101Component* component) override;
+  void send(cc1101::CC1101Component* component) override;
 };
 
 class SomfyComponent : public Component, public Nameable {
@@ -46,14 +46,8 @@ class SomfyComponent : public Component, public Nameable {
 
   void set_transmitter(remote_base::RemoteTransmitterBase* t) { transmitter = t; }
 
-  // TODO: generic
-  void set_configurer(cc1101::CC1101Component* c) {
-    configurer = new SomfyCC1101Configurer();
-    configurer->set_cc1101(c);
-  }
-
  private:
-  SomfyCC1101Configurer* configurer;
+  SomfyRemoteConfigurer* configurer = new SomfyRemoteConfigurer();
   remote_base::RemoteTransmitterBase* transmitter{nullptr};
 
   std::array<uint8_t, 7> build_frame(uint32_t address, uint16_t code, uint8_t command);

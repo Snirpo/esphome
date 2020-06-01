@@ -12,7 +12,7 @@ void KakuComponent::dump_config() {}
 float KakuComponent::get_setup_priority() const { return setup_priority::DATA; }
 
 void KakuComponent::send(uint32_t address, uint8_t unit, bool on, float brightness) {
-  auto call = transmitter->transmit();
+  auto call = transmitter->transmit(configurer);
   auto *data = call.get_data();
   data->reset();
 
@@ -257,6 +257,12 @@ void KakuLightComponent::write_state(light::LightState *state) {
     parent->send(address, unit, state->current_values.is_on(), state->current_values.get_brightness());
   }
   ignore = false;
+}
+
+void KakuRemoteConfigurer::receive(cc1101::CC1101Component *component) { component->receive(); }
+
+void KakuRemoteConfigurer::send(cc1101::CC1101Component *component) {
+  component->send(cc1101::SERIAL_CONFIG, cc1101::SERIAL_PATABLE);  // TODO change to KAKU config instead of default
 }
 
 }  // namespace kaku
