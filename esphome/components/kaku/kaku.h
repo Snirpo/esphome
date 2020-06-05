@@ -60,7 +60,9 @@ class KakuLightComponent : public Component, public light::LightOutput {
   }
   void set_address(uint32_t a) { address = a; }
   void set_unit(uint8_t u) { unit = u; }
-  uint8_t get_unit() { return unit; }
+
+  bool equals(uint32_t a, uint8_t u) { return a == address && u == unit; }
+  bool equals(uint32_t a) { return a == address; }
 
  private:
   KakuComponent* parent;

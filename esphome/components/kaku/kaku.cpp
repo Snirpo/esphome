@@ -117,11 +117,13 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
 
   if (group) {
     for (auto *light : lights) {
-      light->update_state(on);
+      if (light->equals(address)) {
+        light->update_state(on);
+      }
     }
   } else {
     for (auto *light : lights) {
-      if (light->get_unit() == unit) {
+      if (light->equals(address, unit)) {
         light->update_state(on);
         break;
       }
