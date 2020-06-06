@@ -115,6 +115,12 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
   //    ESP_LOGD(TAG, "Dim level: %d", dim_value);
   //  }
 
+  auto msg = KakuMessage(address, group, on, unit);
+  if (lastMessage == msg) {
+    return true;
+  }
+  lastMessage = msg;
+
   if (group) {
     for (auto *light : lights) {
       if (light->equals(address)) {
@@ -245,7 +251,6 @@ void KakuLightComponent::update_state(bool on) {
   auto call = this->state_->make_call();
   call.set_state(on);
   call.perform();
-  ignore = true;
 }
 
 light::LightTraits KakuLightComponent::get_traits() {
@@ -255,10 +260,7 @@ light::LightTraits KakuLightComponent::get_traits() {
 }
 
 void KakuLightComponent::write_state(light::LightState *state) {
-  if (!ignore) {
-    parent->send(address, unit, state->current_values.is_on(), state->current_values.get_brightness());
-  }
-  ignore = false;
+  parent->send(address, unit, state->current_values.is_on(), state->current_values.get_brightness());
 }
 
 void KakuRemoteConfigurer::receive(cc1101::CC1101Component *component) { component->receive(); }

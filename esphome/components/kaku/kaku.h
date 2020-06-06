@@ -14,6 +14,24 @@ class KakuRemoteConfigurer : public remote_base::RemoteConfigurer {
   void send(cc1101::CC1101Component* component) override;
 };
 
+class KakuMessage {
+ public:
+  KakuMessage(uint32_t address, bool group, bool on, uint8_t unit)
+      : address(address), group(group), on(on), unit(unit) {}
+
+  bool operator==(const KakuMessage& rhs) const {
+    return address == rhs.address && group == rhs.group && on == rhs.on && unit == rhs.unit;
+  }
+
+  bool operator!=(const KakuMessage& rhs) const { return !(rhs == *this); }
+
+ private:
+  uint32_t address = 0;
+  bool group = false;
+  bool on = false;
+  uint8_t unit = 0;
+};
+
 class KakuComponent : public Component, public remote_base::RemoteReceiverListener {
  public:
   void dump_config() override;
@@ -26,9 +44,10 @@ class KakuComponent : public Component, public remote_base::RemoteReceiverListen
   void register_light(KakuLightComponent* component) { lights.push_back(component); }
 
  private:
+  KakuMessage lastMessage = KakuMessage(0, false, 0, 0);
   KakuRemoteConfigurer* configurer = new KakuRemoteConfigurer();
   remote_base::RemoteTransmitterBase* transmitter{nullptr};
-  std::vector<KakuLightComponent*> lights;
+  std::vector<KakuLightComponent*> lights{8};
 
   bool expect_dim(remote_base::RemoteReceiveData& src) const;
   bool expect_one(remote_base::RemoteReceiveData& src) const;
@@ -61,8 +80,8 @@ class KakuLightComponent : public Component, public light::LightOutput {
   void set_address(uint32_t a) { address = a; }
   void set_unit(uint8_t u) { unit = u; }
 
-  bool equals(uint32_t a, uint8_t u) { return a == address && u == unit; }
-  bool equals(uint32_t a) { return a == address; }
+  bool equals(uint32_t a, uint8_t u) const { return a == address && u == unit; }
+  bool equals(uint32_t a) const { return a == address; }
 
  private:
   KakuComponent* parent;
