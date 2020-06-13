@@ -155,48 +155,59 @@ static const std::vector<register_setting> SERIAL_CONFIG{
     {CC1101_PKTCTRL0, 0x32}, {CC1101_MDMCFG3, 0x93},  {CC1101_MDMCFG4, 0x07},  {CC1101_MDMCFG2, 0x30},
     {CC1101_FREND0, 0x11}};
 
+//static const std::vector<register_setting> SERIAL_CONFIG{
+//    {CC1101_FREQ2, 0x10},    {CC1101_FREQ1, 0xB0},    {CC1101_FREQ0, 0x71},    {CC1101_FSCTRL1, 0x06},
+//    {CC1101_MDMCFG1, 0x03},  {CC1101_MDMCFG0, 0xFF},  {CC1101_CHANNR, 0x00},   {CC1101_DEVIATN, 0x62},
+//    {CC1101_FREND1, 0x56},   {CC1101_MCSM0, 0x18},    {CC1101_FOCCFG, 0x1D},   {CC1101_BSCFG, 0x1C},
+//    {CC1101_AGCCTRL2, 0x04}, {CC1101_AGCCTRL1, 0x00}, {CC1101_AGCCTRL0, 0x92}, {CC1101_FSCAL3, 0xEA},
+//    {CC1101_FSCAL2, 0x2A},   {CC1101_FSCAL1, 0x00},   {CC1101_FSCAL0, 0x1F},   {CC1101_FSTEST, 0x59},
+//    {CC1101_TEST2, 0x81},    {CC1101_TEST1, 0x35},    {CC1101_TEST0, 0x09},    {CC1101_PKTCTRL1, 0x04},
+//    {CC1101_ADDR, 0x00},     {CC1101_PKTLEN, 0x3D},   {CC1101_IOCFG2, 0x0D},   {CC1101_IOCFG0, 0x0D},
+//    {CC1101_PKTCTRL0, 0x32}, {CC1101_MDMCFG3, 0x3B},  {CC1101_MDMCFG4, 0x2D},  {CC1101_MDMCFG2, 0x30},
+//    {CC1101_FREND0, 0xB6},   {CC1101_FREND0, 0x11}};
+
 // Somfy
-//0x0D,// 00 IOCFG2   *29   *0B    GDO2 as serial output
-//0x2E,// 01 IOCFG1    2E    2E    Tri-State
-//0x2D,// 02 IOCFG0   *3F   *0C    GDO0 for input
-//0x07,// 03 FIFOTHR   07   *47
-//0xD3,// 04 SYNC1     D3    D3
-//0x91,// 05 SYNC0     91    91
-//0x3D,// 06 PKTLEN   *FF    3D
-//0x04,// 07 PKTCTRL1  04    04
-//0x32,// 08 PKTCTRL0 *45    32
-//0x00,// 09 ADDR      00    00
-//0x00,// 0A CHANNR    00    00
-//0x06,// 0B FSCTRL1  *0F    06    152kHz IF Frquency
-//0x00,// 0C FSCTRL0   00    00
-//0x10,// 0D FREQ2    *1E    21    433.42 (10,AB,85: Somfy RTS Frequency)
-//0xAB,// 0E FREQ1    *C4    65
-//0xA5,// 0F FREQ0    *EC    e8
-//0x55,// 10 MDMCFG4  *8C    55    bWidth 325kHz
-//0x0A,// 11 MDMCFG3  *22   *43    Drate: 828 ((256+11)*2^5)*26000000/2^28
-//0x30,// 12 MDMCFG2  *02   *B0    Modulation: ASK
-//0x23,// 13 MDMCFG1  *22    23
-//0xb9,// 14 MDMCFG0  *F8    b9    ChannelSpace: 350kHz
-//0x00,// 15 DEVIATN  *47    00
-//0x07,// 16 MCSM2     07    07
-//0x00,// 17 MCSM1     30    30
-//0x18,// 18 MCSM0    *04    18    Calibration: RX/TX->IDLE
-//0x14,// 19 FOCCFG   *36    14
-//0x6C,// 1A BSCFG     6C    6C
-//0x07,// 1B AGCCTRL2 *03   *03    42 dB instead of 33dB
-//0x00,// 1C AGCCTRL1 *40   *40
-//0x90,// 1D AGCCTRL0 *91   *92    4dB decision boundery
-//0x87,// 1E WOREVT1   87    87
-//0x6B,// 1F WOREVT0   6B    6B
-//0xF8,// 20 WORCTRL   F8    F8
-//0x56,// 21 FREND1    56    56
-//0x11,// 22 FREND0   *16    17    0x11 for no PA ramping
-//0xE9,// 23 FSCAL3   *A9    E9
-//0x2A,// 24 FSCAL2   *0A    2A
-//0x00,// 25 FSCAL1    20    00
-//0x1F,// 26 FSCAL0    0D    1F
-//0x41,// 27 RCCTRL1   41    41
-//0x00,// 28 RCCTRL0   00    00
+// 0x0D,// 00 IOCFG2   *29   *0B    GDO2 as serial output
+// 0x2E,// 01 IOCFG1    2E    2E    Tri-State
+// 0x2D,// 02 IOCFG0   *3F   *0C    GDO0 for input
+// 0x07,// 03 FIFOTHR   07   *47
+// 0xD3,// 04 SYNC1     D3    D3
+// 0x91,// 05 SYNC0     91    91
+// 0x3D,// 06 PKTLEN   *FF    3D
+// 0x04,// 07 PKTCTRL1  04    04
+// 0x32,// 08 PKTCTRL0 *45    32
+// 0x00,// 09 ADDR      00    00
+// 0x00,// 0A CHANNR    00    00
+// 0x06,// 0B FSCTRL1  *0F    06    152kHz IF Frquency
+// 0x00,// 0C FSCTRL0   00    00
+// 0x10,// 0D FREQ2    *1E    21    433.42 (10,AB,85: Somfy RTS Frequency)
+// 0xAB,// 0E FREQ1    *C4    65
+// 0xA5,// 0F FREQ0    *EC    e8
+// 0x55,// 10 MDMCFG4  *8C    55    bWidth 325kHz
+// 0x0A,// 11 MDMCFG3  *22   *43    Drate: 828 ((256+11)*2^5)*26000000/2^28
+// 0x30,// 12 MDMCFG2  *02   *B0    Modulation: ASK
+// 0x23,// 13 MDMCFG1  *22    23
+// 0xb9,// 14 MDMCFG0  *F8    b9    ChannelSpace: 350kHz
+// 0x00,// 15 DEVIATN  *47    00
+// 0x07,// 16 MCSM2     07    07
+// 0x00,// 17 MCSM1     30    30
+// 0x18,// 18 MCSM0    *04    18    Calibration: RX/TX->IDLE
+// 0x14,// 19 FOCCFG   *36    14
+// 0x6C,// 1A BSCFG     6C    6C
+// 0x07,// 1B AGCCTRL2 *03   *03    42 dB instead of 33dB
+// 0x00,// 1C AGCCTRL1 *40   *40
+// 0x90,// 1D AGCCTRL0 *91   *92    4dB decision boundery
+// 0x87,// 1E WOREVT1   87    87
+// 0x6B,// 1F WOREVT0   6B    6B
+// 0xF8,// 20 WORCTRL   F8    F8
+// 0x56,// 21 FREND1    56    56
+// 0x11,// 22 FREND0   *16    17    0x11 for no PA ramping
+// 0xE9,// 23 FSCAL3   *A9    E9
+// 0x2A,// 24 FSCAL2   *0A    2A
+// 0x00,// 25 FSCAL1    20    00
+// 0x1F,// 26 FSCAL0    0D    1F
+// 0x41,// 27 RCCTRL1   41    41
+// 0x00,// 28 RCCTRL0   00    00
 
 static const std::vector<uint8_t> SERIAL_PATABLE = {0x00, 0x1D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 

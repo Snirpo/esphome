@@ -117,6 +117,7 @@ bool KakuComponent::on_receive(remote_base::RemoteReceiveData data) {
 
   auto msg = KakuMessage(address, group, on, unit);
   if (lastMessage == msg) {
+    ESP_LOGD(TAG, "Same as last message, ignoring");
     return true;
   }
   lastMessage = msg;
