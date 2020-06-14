@@ -209,7 +209,7 @@ static const std::vector<register_setting> SERIAL_CONFIG{
 // 0x41,// 27 RCCTRL1   41    41
 // 0x00,// 28 RCCTRL0   00    00
 
-static const std::vector<uint8_t> SERIAL_PATABLE = {0x00, 0x1D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static const std::vector<uint8_t> SERIAL_PATABLE = {0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 };  // namespace cc1101
 }  // namespace esphome

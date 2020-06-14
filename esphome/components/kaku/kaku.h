@@ -9,6 +9,20 @@ namespace kaku {
 
 class KakuLightComponent;
 
+class KakuLightUnit {
+ public:
+  KakuLightUnit(uint32_t address, uint8_t unit) : address(address), unit(unit) {}
+
+  bool isUnit(uint32_t a, uint8_t u) const { return address == a && unit == u; }
+
+  uint32_t getAddress() const { return address; }
+  uint8_t getUnit() const { return unit; }
+
+ private:
+  uint32_t address;
+  uint8_t unit;
+};
+
 class KakuMessage {
  public:
   KakuMessage(uint32_t address, bool group, bool on, uint8_t unit)
@@ -71,16 +85,32 @@ class KakuLightComponent : public Component, public light::LightOutput {
     parent = component;
     component->register_light(this);
   }
-  void set_address(uint32_t a) { address = a; }
-  void set_unit(uint8_t u) { unit = u; }
 
-  bool equals(uint32_t a, uint8_t u) const { return a == address && u == unit; }
-  bool equals(uint32_t a) const { return a == address; }
+  void add_group(uint32_t g) { groups.push_back(g); }
+  void add_unit(KakuLightUnit u) { units.push_back(u); }
+
+  bool equals(uint32_t a, uint8_t u) const {
+    for (const auto& unit : units) {
+      if (unit.isUnit(a, u)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool equals(uint32_t a) const {
+    for (const auto& address : groups) {
+      if (address == a) {
+        return true;
+      }
+    }
+    return false;
+  }
 
  private:
   KakuComponent* parent;
-  uint32_t address;
-  uint8_t unit = 0;
+  std::vector<uint32_t> groups;
+  std::vector<KakuLightUnit> units;
   light::LightState* state_;
   bool ignore = false;
 };

@@ -62,7 +62,7 @@ void CC1101Component::setup() {
 void CC1101Component::loop() {
   if (this->interruptData_.data_available) {
     int16_t rssi = this->read_rssi();
-    ESP_LOGD(TAG, "Data available in RX FIFO! (%02x) (%4d dBm)", this->interruptData_.count, rssi);
+    ESP_LOGVV(TAG, "Data available in RX FIFO! (%02x) (%4d dBm)", this->interruptData_.count, rssi);
   }
 }
 
@@ -152,7 +152,7 @@ uint8_t CC1101Component::receive() {
     yield();
     marcstate = (this->read_register(CC1101_MARCSTATE) & CC1101_BITS_MARCSTATE);
 
-    ESP_LOGD(TAG, "CC1101 check MARCSTATE for RX (current state %02X)", marcstate);
+    ESP_LOGVV(TAG, "CC1101 check MARCSTATE for RX (current state %02X)", marcstate);
 
     if (marcstate == CC1101_MARCSTATE_RXFIFO_OVERFLOW) {
       this->write_command_strobe(CC1101_SFRX);
@@ -187,7 +187,7 @@ uint8_t CC1101Component::send() {
     yield();
     marcstate = (this->read_register(CC1101_MARCSTATE) & CC1101_BITS_MARCSTATE);
 
-    ESP_LOGD(TAG, "CC1101 check MARCSTATE for TX (current state %02X)", marcstate);
+    ESP_LOGVV(TAG, "CC1101 check MARCSTATE for TX (current state %02X)", marcstate);
 
     if (++counter > 200) {
       ESP_LOGW(TAG, "CC1101 stuck, retry STX strobe");

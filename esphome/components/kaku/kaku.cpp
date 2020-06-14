@@ -249,6 +249,8 @@ void KakuComponent::pause(remote_base::RemoteTransmitData &src) const {
 void KakuLightComponent::setup_state(light::LightState *state) { this->state_ = state; }
 
 void KakuLightComponent::update_state(bool on) {
+  ignore = true;
+
   auto call = this->state_->make_call();
   call.set_state(on);
   call.perform();
@@ -261,7 +263,16 @@ light::LightTraits KakuLightComponent::get_traits() {
 }
 
 void KakuLightComponent::write_state(light::LightState *state) {
-  parent->send(address, unit, state->current_values.is_on(), state->current_values.get_brightness());
+  if (ignore) {
+    ignore = false;
+    return;
+  }
+
+  if (!units.empty()) {
+    const auto &unit = units.front();
+    parent->send(unit.getAddress(), unit.getUnit(), state->current_values.is_on(),
+                 state->current_values.get_brightness());
+  }
 }
 
 }  // namespace kaku
